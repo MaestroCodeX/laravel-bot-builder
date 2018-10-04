@@ -79,8 +79,9 @@ class Telegramcommand extends Command
                             break;
                         }
 
+                        
 
-
+                        
                         switch($value['message']['text'])
                         {
                             case trans('start.StartBot'):
@@ -101,6 +102,9 @@ class Telegramcommand extends Command
                             case trans('start.createBotContinue'):
                                 app(BotController::class)->createBot($telegram,$value['message']);
                                 break;
+                            case strpos($value['message']['text'],'@') === 0:
+                                app(BotController::class)->BotAction($telegram,$value['message']);
+                                break;    
                             default:
                                 app(StartController::class)->notFound($telegram,$value['message']);
                                 break;

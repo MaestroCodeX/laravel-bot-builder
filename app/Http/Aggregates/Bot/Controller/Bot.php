@@ -266,11 +266,13 @@ class BotController extends Controller
   
     public function myBots($telegram,$message)
     {
-        $bots = $this->bot->
-        $keyboard = [
-            [trans('start.PreviusBtn')]
-            [trans('start.PreviusBtn')]
-        ];
+        $bots = $this->bot->userBots($message['chat']['id']);
+        foreach($bots as $bot)
+        {
+            $keys[] = ['@'.$bot['username']];
+        }
+        array_push($keys,[trans('start.PreviusBtn')]);
+        $keyboard = $keys;
 
         $reply_markup = $telegram->replyKeyboardMarkup([
             'keyboard' => $keyboard, 
@@ -290,5 +292,31 @@ class BotController extends Controller
         ]);
     }
 
+
+
+    public function BotAction($telegram,$message)
+    {
+        $keyboard = [
+            [trans('start.deleteBot')],
+            [trans('start.PreviusBtn')]
+        ];
+
+        $reply_markup = $telegram->replyKeyboardMarkup([
+            'keyboard' => $keyboard, 
+            'resize_keyboard' => true, 
+            'one_time_keyboard' => false
+        ]);
+        $html = "
+        <i>چه عملیاتی میخواهید بر روی ربات زیر انجام دهید؟</i>
+        <i>از کیبورد زیر انتخاب کنید.</i>
+        ";
+        return $telegram->sendMessage([
+            'chat_id' => $message['chat']['id'],
+            'reply_to_message_id' => $message['message_id'], 
+            'text' => $html, 
+            'parse_mode' => 'HTML',
+            'reply_markup' => $reply_markup
+        ]);
+    }
 
 }
