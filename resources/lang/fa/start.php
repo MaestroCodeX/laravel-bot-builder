@@ -18,5 +18,4 @@ return [
 	"CreateBotVideo" => "آموزش تصویری ساخت ربات در بات فادر",
 	"repeatSms" => "ارسال مجدد پیامک",
 	"createBotContinue" => 'تایید و ساخت بات',
-	"home" => 'صفحه نخست'
 ];

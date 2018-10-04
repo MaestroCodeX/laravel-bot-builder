@@ -65,36 +65,17 @@ class Telegramcommand extends Command
                             break;
                         }
 
-
                         // get botfather token with exact token
                         if(strlen($value['message']['text']) >= 45 && strlen($value['message']['text']) < 150)
                         {
-                            config(['telegram.bot_token' => $value['message']['text']]);
-                            $telegramBot = new Api(config('telegram.bot_token'));
-                            $createdBot = $telegramBot->getMe();
-                            if($createdBot->toArray() == [])
-                            {
-                                app(BotController::class)->botNotFound($telegram,$value['message']);
-                                break;
-                            }
-                            app(BotController::class)->checkAndCreateBot($value['message']['text'],$createdBot,$telegram,$value['message']);
+                            app(BotController::class)->validateBotWithToken($value,$telegram);
                             break;
                         }
 
                         // get botfather token with forwarded text in botfather
                         if(strlen($value['message']['text']) > 150)
                         {
-                            $text =  explode(' ',substr($value['message']['text'], strpos($value['message']['text'], 'API:')));
-                            $cleanText = str_replace(["API:","\n","For",'"'],"",$text[0]);
-                            config(['telegram.bot_token' => $cleanText]);
-                            $telegramBot = new Api(config('telegram.bot_token'));
-                            $createdBot = $telegramBot->getMe();
-                            if($createdBot->toArray() == [])
-                            {
-                                app(BotController::class)->botNotFound($telegram,$value['message']);
-                                break;
-                            }
-                            app(BotController::class)->checkAndCreateBot($cleanText,$createdBot,$telegram,$value['message']);
+                            app(BotController::class)->validateBotWithTokenText($value,$telegram);
                             break;
                         }
 
@@ -105,12 +86,15 @@ class Telegramcommand extends Command
                             case trans('start.StartBot'):
                                 app(StartController::class)->start($telegram,$value['message']);
                                 break;
-                            case trans('start.home'):
+                            case trans('start.PreviusBtn'):
                                 app(StartController::class)->start($telegram,$value['message']);
                                 break;
                             case trans('start.NewBot'):
                                 app(BotController::class)->newBot($telegram,$value['message']);
                                 break;        
+                            case trans('start.MyBots'):
+                                app(BotController::class)->myBots($telegram,$value['message']);
+                                break;  
                             case trans('start.repeatSms'):
                                 app(UserController::class)->repeatSms($telegram,$value['message']);
                                 break;
@@ -121,7 +105,7 @@ class Telegramcommand extends Command
                                 app(StartController::class)->notFound($telegram,$value['message']);
                                 break;
                         }
-                        
+                    
 
                     }
 

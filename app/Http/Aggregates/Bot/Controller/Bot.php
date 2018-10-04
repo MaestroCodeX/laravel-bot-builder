@@ -4,6 +4,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Aggregates\User\Controller\UserController;
 use App\Http\Aggregates\Bot\Contract\BotContract as Bot;
 use App\Http\Aggregates\User\Contract\UserContract as User;
+use Telegram\Bot\Api;
 
 class BotController extends Controller
 {
@@ -106,13 +107,15 @@ class BotController extends Controller
         if($user == null)
         {   
             app(UserController::class)->userNotFound($telegram,$message);
+            config(['telegram.bot_token' => env('TELEGRAM_BOT_TOKEN')]);
             return true;
         }
 
         $bot = $this->bot->getBot($botInfo->getId());
-        if($user !== null)
+        if($bot !== null)
         {   
             $this->botExist($telegram,$message);
+            config(['telegram.bot_token' => env('TELEGRAM_BOT_TOKEN')]);
             return true;
         }
 
@@ -126,7 +129,7 @@ class BotController extends Controller
         $this->bot->createBot($data);
 
         $keyboard = [
-            [trans('start.home')]
+            [trans('start.PreviusBtn')]
         ];
 
         $reply_markup = $telegram->replyKeyboardMarkup([
@@ -148,7 +151,7 @@ class BotController extends Controller
         $inline_keyboard = json_encode([
             'inline_keyboard'=>[
                 [
-                    ['text'=>$botInfo->getFirstName(), 'url'=>'tg://@'.$botInfo->getUsername()]
+                    ['text'=>$botInfo->getFirstName(), 'url'=>'https://t.me/'.$botInfo->getUsername()]
                 ],
             ]
         ]);
@@ -175,7 +178,7 @@ class BotController extends Controller
     public function botNotFound($telegram,$message)
     {
         $keyboard = [
-            [trans('start.home')]
+            [trans('start.PreviusBtn')]
         ];
 
         $reply_markup = $telegram->replyKeyboardMarkup([
@@ -201,7 +204,7 @@ class BotController extends Controller
     public function botExist($telegram,$message)
     {
         $keyboard = [
-            [trans('start.home')]
+            [trans('start.PreviusBtn')]
         ];
 
         $reply_markup = $telegram->replyKeyboardMarkup([
@@ -220,4 +223,72 @@ class BotController extends Controller
             'reply_markup' => $reply_markup
         ]);
     }
+
+
+
+    public function validateBotWithToken($value,$telegram)
+    {
+        config(['telegram.bot_token' => $value['message']['text']]);
+        $telegramBot = new Api(config('telegram.bot_token'));
+        $createdBot = $telegramBot->getMe();
+        if($createdBot->toArray() == [])
+        {
+            $this->botNotFound($telegram,$value['message']);
+            config(['telegram.bot_token' => env('TELEGRAM_BOT_TOKEN')]);
+            return true;
+        }
+        $this->checkAndCreateBot($value['message']['text'],$createdBot,$telegram,$value['message']);
+        config(['telegram.bot_token' => env('TELEGRAM_BOT_TOKEN')]);
+        return true;
+    }
+
+
+    public function validateBotWithTokenText($value,$telegram)
+    {
+        $text =  explode(' ',substr($value['message']['text'], strpos($value['message']['text'], 'API:')));
+        $cleanText = str_replace(["API:","\n","For",'"'],"",$text[0]);
+        config(['telegram.bot_token' => $cleanText]);
+        $telegramBot = new Api(config('telegram.bot_token'));
+        $createdBot = $telegramBot->getMe();
+        if($createdBot->toArray() == [])
+        {
+            $this->botNotFound($telegram,$value['message']);
+            config(['telegram.bot_token' => env('TELEGRAM_BOT_TOKEN')]);
+            return true;
+        }
+        $this->checkAndCreateBot($cleanText,$createdBot,$telegram,$value['message']);
+        config(['telegram.bot_token' => env('TELEGRAM_BOT_TOKEN')]);
+        return true;
+    }
+
+
+
+  
+    public function myBots($telegram,$message)
+    {
+        $bots = $this->bot->
+        $keyboard = [
+            [trans('start.PreviusBtn')]
+            [trans('start.PreviusBtn')]
+        ];
+
+        $reply_markup = $telegram->replyKeyboardMarkup([
+            'keyboard' => $keyboard, 
+            'resize_keyboard' => true, 
+            'one_time_keyboard' => false
+        ]);
+        $html = "
+        <i>برای مشاهده تنظیمات بیشتر </i>
+        <i>ربات خود را از طریق دکمه های زیر انتخاب کنید</i>
+        ";
+        return $telegram->sendMessage([
+            'chat_id' => $message['chat']['id'],
+            'reply_to_message_id' => $message['message_id'], 
+            'text' => $html, 
+            'parse_mode' => 'HTML',
+            'reply_markup' => $reply_markup
+        ]);
+    }
+
+
 }

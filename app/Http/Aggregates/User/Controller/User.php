@@ -82,7 +82,7 @@ class UserController extends Controller
         $client->request('GET',$api);
 
         $keyboard = [
-            [trans('start.home')]
+            [trans('start.PreviusBtn')]
         ];
 
         $reply_markup = $telegram->replyKeyboardMarkup([
@@ -150,7 +150,7 @@ class UserController extends Controller
     public function userNotFound($telegram,$message)
     {
         $keyboard = [
-            [trans('start.home')]
+            [trans('start.PreviusBtn')]
         ];
 
         $reply_markup = $telegram->replyKeyboardMarkup([

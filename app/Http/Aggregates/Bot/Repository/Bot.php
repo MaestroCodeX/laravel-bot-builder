@@ -15,4 +15,10 @@ class BotRepository implements BotContract
     {
         return Bot::where('bot_id',$botId)->first();
     }
+
+    public function userBots($user_id)
+    {
+        return Bot::where('bot_id',$botId)->first();
+    }
+    
 }

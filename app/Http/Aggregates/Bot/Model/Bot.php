@@ -2,7 +2,7 @@
 
 use Illuminate\Database\Eloquent\Model as Eloquent;
 use Illuminate\Database\Eloquent\SoftDeletes;
-
+use App\Http\Aggregates\User\Model\User;
 class Bot extends Eloquent
 {
     use SoftDeletes;
@@ -14,5 +14,10 @@ class Bot extends Eloquent
     protected $fillable = ['id','user_id','name','bot_id','username','token','description'];
 
     protected $dates = ['deleted_at'];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class,'user_id');
+    }
    
 }
