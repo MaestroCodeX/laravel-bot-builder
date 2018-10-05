@@ -53,7 +53,6 @@ class Telegramcommand extends Command
                 {
                     $last_update = $value['update_id'];
                     
-                    
 
                     if(isset($value['message']['text']))
                     {
@@ -80,7 +79,6 @@ class Telegramcommand extends Command
                         }
 
                         
-
                         
                         switch($value['message']['text'])
                         {

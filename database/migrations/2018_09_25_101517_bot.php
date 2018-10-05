@@ -20,8 +20,8 @@ class Bot extends Migration
                         $table->unsignedInteger('user_id')->nullable();
                         $table->unsignedBigInteger('bot_id')->nullable();
                         $table->string('name',100)->nullable();
-                        $table->string('username',100)->unique()->index();
-                        $table->string('token',700)->unique()->index();
+                        $table->string('username',100)->index();
+                        $table->string('token',700)->index();
                         $table->text('description')->nullable();
                         $table->foreign('user_id')->references('id')->on('users');
                         $table->timestamps();

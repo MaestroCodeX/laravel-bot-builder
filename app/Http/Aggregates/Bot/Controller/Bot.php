@@ -268,6 +268,29 @@ class BotController extends Controller
     public function myBots($telegram,$message)
     {
         $bots = $this->bot->userBots($message['chat']['id']);
+        if($bots->toarray() == [])
+        {
+            $keyboard = [
+                [trans('start.PreviusBtn')]
+            ];
+    
+            $reply_markup = $telegram->replyKeyboardMarkup([
+                'keyboard' => $keyboard, 
+                'resize_keyboard' => true, 
+                'one_time_keyboard' => false
+            ]);
+            $html = "
+            <code>شما هنوز رباتی نساخته اید</code>
+            ";
+            return $telegram->sendMessage([
+                'chat_id' => $message['chat']['id'],
+                'reply_to_message_id' => $message['message_id'], 
+                'text' => $html, 
+                'parse_mode' => 'HTML',
+                'reply_markup' => $reply_markup
+            ]);
+        }
+
         foreach($bots as $bot)
         {
             $keys[] = ['@'.$bot['username']];
@@ -333,14 +356,14 @@ class BotController extends Controller
     public function deleteBot($telegram,$message)
     {
         $key = $message['chat']['id'].'_delete';
-        if(Cache::has($cacheKey))
+        if(Cache::has($key))
         {
             $value = Cache::get($key);
             $bot = $this->bot->getBotByName($message['chat']['id'],$value);
             if($bot !== null)
             {
                 $this->bot->deleteBot($value);
-                Cache::forget($cacheKey);
+                Cache::forget($key);
                 $keyboard = [
                     [trans('start.PreviusBtn')]
                 ];
