@@ -2,43 +2,29 @@
 
 use Telegram\Bot\Api;
 use Illuminate\Console\Command;
-use App\Http\Aggregates\Start\Controller\StartController;
 use App\Http\Aggregates\Bot\Controller\BotController;
 use App\Http\Aggregates\User\Controller\UserController;
-
+use App\Http\Aggregates\Start\Controller\StartController;
+use App\Http\Aggregates\AdminBot\Controller\AdminBotController;
+use App\Http\Aggregates\User\Contract\UserContract;
 
 class Telegramcommand extends Command
 {
-    /**
-     * The name and signature of the console command.
-     *
-     * @var string
-     */
+
     protected $signature = 'telegram:listen';
 
-    /**
-     * The console command description.
-     *
-     * @var string
-     */
+
     protected $description = 'telegram bot long polling';
 
-    /**
-     * Create a new command instance.
-     *
-     * @return void
-     */
+    private $user;
 
-    public function __construct()
+    public function __construct(UserContract $user)
     {
+        $this->user = $user;
         parent::__construct();
     }
 
-    /**
-     * Execute the console command.
-     *
-     * @return mixed
-     */
+
     public function handle()
     {
         set_time_limit(0);
@@ -53,7 +39,6 @@ class Telegramcommand extends Command
                 {
                     $last_update = $value['update_id'];
                     
-
                     if(isset($value['message']['text']))
                     {
 
@@ -63,23 +48,27 @@ class Telegramcommand extends Command
                             app(UserController::class)->checkAndActiveUser($telegram,$value['message']);
                             break;
                         }
-
                         // get botfather token with exact token
-                        if(strlen($value['message']['text']) >= 45 && strlen($value['message']['text']) < 150)
+                        if(strlen($value['message']['text']) >= 35 && strlen($value['message']['text']) < 150)
                         {
                             app(BotController::class)->validateBotWithToken($value,$telegram);
                             break;
                         }
-
                         // get botfather token with forwarded text in botfather
                         if(strlen($value['message']['text']) > 150)
                         {
                             app(BotController::class)->validateBotWithTokenText($value,$telegram);
                             break;
                         }
+                        //register user with their contact
+                        if(isset($value['message']['contact']))
+                        {
+                            app(UserController::class)->register($telegram,$value['message']);
+                            break;
+                        }   
 
-                        
-                        
+
+
                         switch($value['message']['text'])
                         {
                             case trans('start.StartBot'):
@@ -110,16 +99,13 @@ class Telegramcommand extends Command
                                 app(StartController::class)->notFound($telegram,$value['message']);
                                 break;
                         }
+
+
+                        
+
+                    }
+
                     
-
-                    }
-
-                    if(isset($value['message']['contact']))
-                    {
-                        app(UserController::class)->register($telegram,$value['message']);
-                        break;
-                    }
-
 
                 }
             }

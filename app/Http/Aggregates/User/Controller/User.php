@@ -21,6 +21,27 @@ class UserController extends Controller
 
     public function register($telegram,$message)
     {
+        if(strpos($message['contact']['phone_number'],'98') !== 0 || strpos($message['contact']['phone_number'],'+98') !== 0)
+        {
+                $keyboard = [
+                    [trans('start.PreviusBtn')]
+                ];
+                $reply_markup = $telegram->replyKeyboardMarkup([
+                    'keyboard' => $keyboard, 
+                    'resize_keyboard' => true, 
+                    'one_time_keyboard' => false
+                ]);
+                $html = "
+                    <i>نمیتوانید با شماره غیر از ایران عضو شوید</i>
+                ";
+                return $telegram->sendMessage([
+                    'chat_id' => $message['chat']['id'],
+                    'reply_to_message_id' => $message['message_id'], 
+                    'text' => $html, 
+                    'parse_mode' => 'HTML',
+                    'reply_markup' => $reply_markup
+                ]);
+        }
         $code = $this->get_by(5);
         $activation_code = Crypt::encrypt($code);
         $data = [
