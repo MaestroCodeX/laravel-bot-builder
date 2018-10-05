@@ -105,6 +105,9 @@ class Telegramcommand extends Command
                             case strpos($value['message']['text'],'@') === 0:
                                 app(BotController::class)->BotAction($telegram,$value['message']);
                                 break;    
+                            case trans('start.deleteBot'):
+                                app(BotController::class)->deleteBot($telegram,$value['message']);
+                                break;    
                             default:
                                 app(StartController::class)->notFound($telegram,$value['message']);
                                 break;

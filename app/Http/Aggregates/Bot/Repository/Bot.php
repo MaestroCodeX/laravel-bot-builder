@@ -16,11 +16,23 @@ class BotRepository implements BotContract
         return Bot::where('bot_id',$botId)->first();
     }
 
+    public function getBotByName($user_id,$username)
+    {
+        return Bot::where('username','=',$username)->whereHas('user',function($query) use($user_id) {
+            $query->where('telegram_user_id',$user_id);
+        })->first();
+    }
+
     public function userBots($user_id)
     {
         return Bot::whereHas('user',function($query) use($user_id) {
             $query->where('telegram_user_id',$user_id);
         })->get();
+    }
+
+    public function deleteBot($value)
+    {
+        return Bot::where('username','=',$value)->delete();
     }
 
 }

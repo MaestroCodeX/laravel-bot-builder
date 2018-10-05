@@ -1,10 +1,11 @@
 <?php   namespace App\Http\Aggregates\Bot\Controller;
 
+use Telegram\Bot\Api;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Cache;
 use App\Http\Aggregates\User\Controller\UserController;
 use App\Http\Aggregates\Bot\Contract\BotContract as Bot;
 use App\Http\Aggregates\User\Contract\UserContract as User;
-use Telegram\Bot\Api;
 
 class BotController extends Controller
 {
@@ -296,6 +297,14 @@ class BotController extends Controller
 
     public function BotAction($telegram,$message)
     {
+        $cacheKey = $message['chat']['id'].'_delete';    
+        if(Cache::has($cacheKey))
+        {   
+            Cache::forget($cacheKey);
+        }
+        $cacheText = str_replace('@','',$message['text']);
+        Cache::put($cacheKey, $cacheText, 30);
+
         $keyboard = [
             [trans('start.deleteBot')],
             [trans('start.PreviusBtn')]
@@ -318,5 +327,64 @@ class BotController extends Controller
             'reply_markup' => $reply_markup
         ]);
     }
+
+
+
+    public function deleteBot($telegram,$message)
+    {
+        $key = $message['chat']['id'].'_delete';
+        if(Cache::has($cacheKey))
+        {
+            $value = Cache::get($key);
+            $bot = $this->bot->getBotByName($message['chat']['id'],$value);
+            if($bot !== null)
+            {
+                $this->bot->deleteBot($value);
+                Cache::forget($cacheKey);
+                $keyboard = [
+                    [trans('start.PreviusBtn')]
+                ];
+        
+                $reply_markup = $telegram->replyKeyboardMarkup([
+                    'keyboard' => $keyboard, 
+                    'resize_keyboard' => true, 
+                    'one_time_keyboard' => false
+                ]);
+                $html = "
+                <i>ربات شما موفقیت شما حذف شد</i>
+                ";
+                return $telegram->sendMessage([
+                    'chat_id' => $message['chat']['id'],
+                    'reply_to_message_id' => $message['message_id'], 
+                    'text' => $html, 
+                    'parse_mode' => 'HTML',
+                    'reply_markup' => $reply_markup
+                ]);
+            }
+        }
+       
+        $keyboard = [
+            [trans('start.PreviusBtn')]
+        ];
+
+        $reply_markup = $telegram->replyKeyboardMarkup([
+            'keyboard' => $keyboard, 
+            'resize_keyboard' => true, 
+            'one_time_keyboard' => false
+        ]);
+        $html = "
+        <i>ربات مورد نظر برای حذف وجود ندارد</i>
+        ";
+        return $telegram->sendMessage([
+            'chat_id' => $message['chat']['id'],
+            'reply_to_message_id' => $message['message_id'], 
+            'text' => $html, 
+            'parse_mode' => 'HTML',
+            'reply_markup' => $reply_markup
+        ]);
+    }
+
+    
+
 
 }
