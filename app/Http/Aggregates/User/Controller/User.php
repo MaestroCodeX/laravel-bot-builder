@@ -25,8 +25,8 @@ class UserController extends Controller
         $activation_code = Crypt::encrypt($code);
         $data = [
             'phone_number' => $message['contact']['phone_number'],
-            'name' => $message['contact']['first_name'],
-            'last_name' => $message['contact']['last_name'],
+            'name' => $message['contact']['first_name'] ?? null,
+            'last_name' => $message['contact']['last_name'] ?? null,
             'telegram_user_id' => $message['contact']['user_id'],
             'username' => $message['chat']['username'] ?? null,
             'activation_code' => $activation_code
