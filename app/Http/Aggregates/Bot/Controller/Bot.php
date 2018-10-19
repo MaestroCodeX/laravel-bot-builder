@@ -1,12 +1,12 @@
 <?php   namespace App\Http\Aggregates\Bot\Controller;
 
+use Telegram;
 use Telegram\Bot\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Cache;
 use App\Http\Aggregates\User\Controller\UserController;
 use App\Http\Aggregates\Bot\Contract\BotContract as Bot;
 use App\Http\Aggregates\User\Contract\UserContract as User;
-
 class BotController extends Controller
 {
 
@@ -25,18 +25,16 @@ class BotController extends Controller
         return $this->bot->botList();
     }
 
-    public function newBot($telegram,$message)
+    public function newBot($message)
     {
         $user = $this->user->get_user($message['chat']['id']);
         if($user !== null && $user->status == 'DEACTIVATE')
         {
-            app(UserController::class)->repeatSms($telegram,$message);
-            return true;
+            return app(UserController::class)->repeatSms($message);
         }
         if($user !== null && $user->status == 'ACTIVATE')
         {
-            $this->createBot($telegram,$message);
-            return true;
+            return $this->createBot($message);
         }
         $keyboard = [
             [[
@@ -45,7 +43,7 @@ class BotController extends Controller
             ]]
         ];
         
-        $reply_markup = $telegram->replyKeyboardMarkup([
+        $reply_markup = Telegram::replyKeyboardMarkup([
             'keyboard' => $keyboard, 
             'resize_keyboard' => true, 
             'one_time_keyboard' => false
@@ -56,7 +54,7 @@ class BotController extends Controller
         <i>برای ادامه کار روی دکمه زیر کلیک کنید.</i>
         ";
 
-        return $telegram->sendMessage([
+        return Telegram::sendMessage([
             'chat_id' => $message['chat']['id'],
             'reply_to_message_id' => $message['message_id'], 
             'text' => $html, 
@@ -70,7 +68,7 @@ class BotController extends Controller
 
 
 
-    public function createBot($telegram,$message)
+    public function createBot($message)
     {
         $user = $this->user->get_user($message['chat']['id']);
 
@@ -78,7 +76,7 @@ class BotController extends Controller
             [trans('start.CreateBotVideo')]
         ];
 
-        $reply_markup = $telegram->replyKeyboardMarkup([
+        $reply_markup = Telegram::replyKeyboardMarkup([
             'keyboard' => $keyboard, 
             'resize_keyboard' => true, 
             'one_time_keyboard' => false
@@ -95,7 +93,7 @@ class BotController extends Controller
         <i>6-</i><code> آن متن طولانی که توکن نامیده میشود را به پی وی رسان (همین ربات) فروارد کنید تا ربات شما ساخته شود.</code>
         
         ";
-        return $telegram->sendMessage([
+        return Telegram::sendMessage([
             'chat_id' => $message['chat']['id'],
             'reply_to_message_id' => $message['message_id'], 
             'text' => $html, 
@@ -107,23 +105,22 @@ class BotController extends Controller
 
 
 
-    public function checkAndCreateBot($botToken,$botInfo,$telegram,$message)
+    public function checkAndCreateBot($botToken,$botInfo,$message)
     {
-
         $user = $this->user->get_user($message['chat']['id']);
         if($user == null)
         {   
-            app(UserController::class)->userNotFound($telegram,$message);
+            app(UserController::class)->userNotFound($message);
             config(['telegram.bot_token' => env('TELEGRAM_BOT_TOKEN')]);
-            return true;
+            return 'DONE';
         }
 
         $bot = $this->bot->getBot($botInfo->getId());
         if($bot !== null)
         {   
-            $this->botExist($telegram,$message);
+            $this->botExist($message);
             config(['telegram.bot_token' => env('TELEGRAM_BOT_TOKEN')]);
-            return true;
+            return 'DONE';
         }
 
         $data = [
@@ -135,13 +132,15 @@ class BotController extends Controller
         ];
         $this->bot->createBot($data);
 
-        $telegram->setWebhook(['url' => config('telegram.webhook_url').'/'.$botToken.'/webhook?bot_id='.$botInfo->getId()]);
+        $newBottelegram = new Api($message['text']);
+
+        $newBottelegram->setWebhook(['url' => config('telegram.webhook_url').$botInfo->getId().'/webhook']);
 
         $keyboard = [
             [trans('start.PreviusBtn')]
         ];
 
-        $reply_markup = $telegram->replyKeyboardMarkup([
+        $reply_markup = Telegram::replyKeyboardMarkup([
             'keyboard' => $keyboard, 
             'resize_keyboard' => true, 
             'one_time_keyboard' => false
@@ -149,7 +148,7 @@ class BotController extends Controller
         $html = "
         <i>ربات شما با موفقیت ایجاد شد</i>
         ";
-        $telegram->sendMessage([
+        Telegram::sendMessage([
             'chat_id' => $message['chat']['id'],
             'reply_to_message_id' => $message['message_id'], 
             'text' => $html, 
@@ -169,14 +168,13 @@ class BotController extends Controller
         <i>برای ورود به ربات روی دکمه زیر کلیک کنید. 😃👇</i>
         ";
 
-        return $telegram->sendMessage([
+         return Telegram::sendMessage([
             'chat_id' => $message['chat']['id'],
             'reply_to_message_id' => $message['message_id'], 
             'text' => $html1, 
             'parse_mode' => 'HTML',
             'reply_markup' => $inline_keyboard
         ]);
-
     }
 
 
@@ -184,13 +182,13 @@ class BotController extends Controller
 
 
 
-    public function botNotFound($telegram,$message)
+    public function botNotFound($message)
     {
         $keyboard = [
             [trans('start.PreviusBtn')]
         ];
 
-        $reply_markup = $telegram->replyKeyboardMarkup([
+        $reply_markup = Telegram::replyKeyboardMarkup([
             'keyboard' => $keyboard, 
             'resize_keyboard' => true, 
             'one_time_keyboard' => false
@@ -198,7 +196,7 @@ class BotController extends Controller
         $html = "
         <i>توکن بات ارسال شده اشتباه است یا در بات فادر ثبت نشده است</i>
         ";
-        return $telegram->sendMessage([
+        return Telegram::sendMessage([
             'chat_id' => $message['chat']['id'],
             'reply_to_message_id' => $message['message_id'], 
             'text' => $html, 
@@ -210,13 +208,13 @@ class BotController extends Controller
 
 
 
-    public function botExist($telegram,$message)
+    public function botExist($message)
     {
         $keyboard = [
             [trans('start.PreviusBtn')]
         ];
 
-        $reply_markup = $telegram->replyKeyboardMarkup([
+        $reply_markup = Telegram::replyKeyboardMarkup([
             'keyboard' => $keyboard, 
             'resize_keyboard' => true, 
             'one_time_keyboard' => false
@@ -224,7 +222,7 @@ class BotController extends Controller
         $html = "
         <i>ربات با توکن ارسالی قبلا ثبت شده است</i>
         ";
-        return $telegram->sendMessage([
+        return Telegram::sendMessage([
             'chat_id' => $message['chat']['id'],
             'reply_to_message_id' => $message['message_id'], 
             'text' => $html, 
@@ -235,24 +233,24 @@ class BotController extends Controller
 
 
 
-    public function validateBotWithToken($value,$telegram)
+    public function validateBotWithToken($value)
     {
         config(['telegram.bot_token' => $value['message']['text']]);
         $telegramBot = new Api(config('telegram.bot_token'));
         $createdBot = $telegramBot->getMe();
         if($createdBot->toArray() == [])
         {
-            $this->botNotFound($telegram,$value['message']);
+            $this->botNotFound($value['message']);
             config(['telegram.bot_token' => env('TELEGRAM_BOT_TOKEN')]);
-            return true;
+            return 'Done';
         }
-        $this->checkAndCreateBot($value['message']['text'],$createdBot,$telegram,$value['message']);
+        $this->checkAndCreateBot($value['message']['text'],$createdBot,$value['message']);
         config(['telegram.bot_token' => env('TELEGRAM_BOT_TOKEN')]);
-        return true;
+        return 'Done';
     }
 
 
-    public function validateBotWithTokenText($value,$telegram)
+    public function validateBotWithTokenText($value)
     {
         $text =  explode(' ',substr($value['message']['text'], strpos($value['message']['text'], 'API:')));
         $cleanText = str_replace(["API:","\n","For",'"'],"",$text[0]);
@@ -261,19 +259,19 @@ class BotController extends Controller
         $createdBot = $telegramBot->getMe();
         if($createdBot->toArray() == [])
         {
-            $this->botNotFound($telegram,$value['message']);
+            $this->botNotFound($value['message']);
             config(['telegram.bot_token' => env('TELEGRAM_BOT_TOKEN')]);
-            return true;
+            return 'Done';
         }
-        $this->checkAndCreateBot($cleanText,$createdBot,$telegram,$value['message']);
+        $this->checkAndCreateBot($cleanText,$createdBot,$value['message']);
         config(['telegram.bot_token' => env('TELEGRAM_BOT_TOKEN')]);
-        return true;
+        return 'Done';
     }
 
 
 
   
-    public function myBots($telegram,$message)
+    public function myBots($message)
     {
         $bots = $this->bot->userBots($message['chat']['id']);
         if($bots->toarray() == [])
@@ -282,7 +280,7 @@ class BotController extends Controller
                 [trans('start.PreviusBtn')]
             ];
     
-            $reply_markup = $telegram->replyKeyboardMarkup([
+            $reply_markup = Telegram::replyKeyboardMarkup([
                 'keyboard' => $keyboard, 
                 'resize_keyboard' => true, 
                 'one_time_keyboard' => false
@@ -290,7 +288,7 @@ class BotController extends Controller
             $html = "
             <code>شما هنوز رباتی نساخته اید</code>
             ";
-            return $telegram->sendMessage([
+            return Telegram::sendMessage([
                 'chat_id' => $message['chat']['id'],
                 'reply_to_message_id' => $message['message_id'], 
                 'text' => $html, 
@@ -306,7 +304,7 @@ class BotController extends Controller
         array_push($keys,[trans('start.PreviusBtn')]);
         $keyboard = $keys;
 
-        $reply_markup = $telegram->replyKeyboardMarkup([
+        $reply_markup = Telegram::replyKeyboardMarkup([
             'keyboard' => $keyboard, 
             'resize_keyboard' => true, 
             'one_time_keyboard' => false
@@ -315,7 +313,7 @@ class BotController extends Controller
         <i>برای مشاهده تنظیمات بیشتر </i>
         <i>ربات خود را از طریق دکمه های زیر انتخاب کنید</i>
         ";
-        return $telegram->sendMessage([
+        return Telegram::sendMessage([
             'chat_id' => $message['chat']['id'],
             'reply_to_message_id' => $message['message_id'], 
             'text' => $html, 
@@ -326,7 +324,7 @@ class BotController extends Controller
 
 
 
-    public function BotAction($telegram,$message)
+    public function BotAction($message)
     {
         $cacheKey = $message['chat']['id'].'_delete';    
         if(Cache::has($cacheKey))
@@ -341,7 +339,7 @@ class BotController extends Controller
             [trans('start.PreviusBtn')]
         ];
 
-        $reply_markup = $telegram->replyKeyboardMarkup([
+        $reply_markup = Telegram::replyKeyboardMarkup([
             'keyboard' => $keyboard, 
             'resize_keyboard' => true, 
             'one_time_keyboard' => false
@@ -350,7 +348,7 @@ class BotController extends Controller
         <i>چه عملیاتی میخواهید بر روی ربات زیر انجام دهید؟</i>
         <i>از کیبورد زیر انتخاب کنید.</i>
         ";
-        return $telegram->sendMessage([
+        return Telegram::sendMessage([
             'chat_id' => $message['chat']['id'],
             'reply_to_message_id' => $message['message_id'], 
             'text' => $html, 
@@ -361,7 +359,7 @@ class BotController extends Controller
 
 
 
-    public function deleteBot($telegram,$message)
+    public function deleteBot($message)
     {
         $key = $message['chat']['id'].'_delete';
         if(Cache::has($key))
@@ -376,7 +374,7 @@ class BotController extends Controller
                     [trans('start.PreviusBtn')]
                 ];
         
-                $reply_markup = $telegram->replyKeyboardMarkup([
+                $reply_markup = Telegram::replyKeyboardMarkup([
                     'keyboard' => $keyboard, 
                     'resize_keyboard' => true, 
                     'one_time_keyboard' => false
@@ -384,7 +382,7 @@ class BotController extends Controller
                 $html = "
                 <i>ربات شما موفقیت شما حذف شد</i>
                 ";
-                return $telegram->sendMessage([
+                return Telegram::sendMessage([
                     'chat_id' => $message['chat']['id'],
                     'reply_to_message_id' => $message['message_id'], 
                     'text' => $html, 
@@ -398,7 +396,7 @@ class BotController extends Controller
             [trans('start.PreviusBtn')]
         ];
 
-        $reply_markup = $telegram->replyKeyboardMarkup([
+        $reply_markup = Telegram::replyKeyboardMarkup([
             'keyboard' => $keyboard, 
             'resize_keyboard' => true, 
             'one_time_keyboard' => false
@@ -406,7 +404,7 @@ class BotController extends Controller
         $html = "
         <i>ربات مورد نظر برای حذف وجود ندارد</i>
         ";
-        return $telegram->sendMessage([
+        return Telegram::sendMessage([
             'chat_id' => $message['chat']['id'],
             'reply_to_message_id' => $message['message_id'], 
             'text' => $html, 

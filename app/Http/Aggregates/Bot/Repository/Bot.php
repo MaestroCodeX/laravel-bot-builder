@@ -18,7 +18,7 @@ class BotRepository implements BotContract
 
     public function getBot($botId)
     {
-        return Bot::where('bot_id',$botId)->first();
+        return Bot::where('bot_id',intval($botId))->with('user')->first();
     }
 
     public function getBotByName($user_id,$username)

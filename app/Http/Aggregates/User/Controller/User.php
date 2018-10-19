@@ -1,5 +1,6 @@
 <?php   namespace App\Http\Aggregates\User\Controller;
 
+use Telegram;
 use Telegram\Bot\Api;
 use GuzzleHttp\Client;
 use App\Http\Controllers\Controller;
@@ -22,14 +23,14 @@ class UserController extends Controller
         $this->bot = $bot;
     }
 
-    public function register($telegram,$message)
+    public function register($message)
     {
         if(strpos($message['contact']['phone_number'],'98') !== 0 || strpos($message['contact']['phone_number'],'+98') !== 0)
         {
                 $keyboard = [
                     [trans('start.PreviusBtn')]
                 ];
-                $reply_markup = $telegram->replyKeyboardMarkup([
+                $reply_markup = Telegram::replyKeyboardMarkup([
                     'keyboard' => $keyboard, 
                     'resize_keyboard' => true, 
                     'one_time_keyboard' => false
@@ -37,7 +38,7 @@ class UserController extends Controller
                 $html = "
                     <i>نمیتوانید با شماره غیر از ایران عضو شوید</i>
                 ";
-                return $telegram->sendMessage([
+                return Telegram::sendMessage([
                     'chat_id' => $message['chat']['id'],
                     'reply_to_message_id' => $message['message_id'], 
                     'text' => $html, 
@@ -66,7 +67,7 @@ class UserController extends Controller
             [trans('start.repeatSms')]
         ];
         
-        $reply_markup = $telegram->replyKeyboardMarkup([
+        $reply_markup = Telegram::replyKeyboardMarkup([
             'keyboard' => $keyboard, 
             'resize_keyboard' => true, 
             'one_time_keyboard' => false
@@ -75,7 +76,7 @@ class UserController extends Controller
             <i>اطلاعات با موفقیت ذخیره شد</i>
             <i>پیامکی حاوی کد فعال سازی به شماره همراه شما ارسال شد لطفا آن را ارسال کنید</i>
         ";
-        return $telegram->sendMessage([
+        return Telegram::sendMessage([
             'chat_id' => $message['chat']['id'],
             'reply_to_message_id' => $message['message_id'], 
             'text' => $html, 
@@ -88,7 +89,7 @@ class UserController extends Controller
 
 
 
-    public function repeatSms($telegram,$message)
+    public function repeatSms($message)
     {
         $code = $this->get_by(5);
         $activation_code = Crypt::encrypt($code);
@@ -109,7 +110,7 @@ class UserController extends Controller
             [trans('start.PreviusBtn')]
         ];
 
-        $reply_markup = $telegram->replyKeyboardMarkup([
+        $reply_markup = Telegram::replyKeyboardMarkup([
             'keyboard' => $keyboard, 
             'resize_keyboard' => true, 
             'one_time_keyboard' => false
@@ -117,7 +118,7 @@ class UserController extends Controller
         $html = "
             <i>پیامکی حاوی کد فعال سازی به شماره همراه شما ارسال شد لطفا آن را ارسال کنید</i>
         ";
-        return $telegram->sendMessage([
+        return Telegram::sendMessage([
             'chat_id' => $message['chat']['id'],
             'reply_to_message_id' => $message['message_id'], 
             'text' => $html, 
@@ -128,7 +129,7 @@ class UserController extends Controller
     
 
 
-    public function checkAndActiveUser($telegram,$message)
+    public function checkAndActiveUser($message)
     {
         $data = [
             'status' => 'ACTIVATE'
@@ -139,7 +140,7 @@ class UserController extends Controller
             [trans('start.createBotContinue')]
         ];
 
-        $reply_markup = $telegram->replyKeyboardMarkup([
+        $reply_markup = Telegram::replyKeyboardMarkup([
             'keyboard' => $keyboard, 
             'resize_keyboard' => true, 
             'one_time_keyboard' => false
@@ -147,7 +148,7 @@ class UserController extends Controller
         $html = "
             <i>حساب کاربری شما فعال شد اکنون میتوانید بات های خود را بسازید</i>
         ";
-        return $telegram->sendMessage([
+        return Telegram::sendMessage([
             'chat_id' => $message['chat']['id'],
             'reply_to_message_id' => $message['message_id'], 
             'text' => $html, 
@@ -171,13 +172,13 @@ class UserController extends Controller
 
 
 
-    public function userNotFound($telegram,$message)
+    public function userNotFound($message)
     {
         $keyboard = [
             [trans('start.PreviusBtn')]
         ];
 
-        $reply_markup = $telegram->replyKeyboardMarkup([
+        $reply_markup = Telegram::replyKeyboardMarkup([
             'keyboard' => $keyboard, 
             'resize_keyboard' => true, 
             'one_time_keyboard' => false
@@ -185,7 +186,7 @@ class UserController extends Controller
         $html = "
             <i>شما در بات عضو نشده اید</i>
         ";
-        return $telegram->sendMessage([
+        return Telegram::sendMessage([
             'chat_id' => $message['chat']['id'],
             'reply_to_message_id' => $message['message_id'], 
             'text' => $html, 
@@ -196,43 +197,82 @@ class UserController extends Controller
 
     
 
-    public function UserBot($token)
+    public function AdminUserBot($updates)
     {
-        $telegram = new Api($token);
-        set_time_limit(0);
-        $last_update = 0;
-        while(true)
-        {
-            $updates = $telegram->getUpdates();
-            foreach ($updates as $key => $value) 
-            {     
-                if($last_update < $value['update_id'])
-                {
-                    $last_update = $value['update_id'];
-                    
+                    $value = $updates;
+   
+              
                     if(isset($value['message']['text']))
                     {
 
                         switch($value['message']['text'])
                         {
                             case trans('start.StartBot'):
-                                app(StartController::class)->start($telegram,$value['message']);
-                                break;
-                            case trans('start.PreviusBtn'):
-                                app(StartController::class)->start($telegram,$value['message']);
-                                break;  
+                                return $this->start($value['message']);
                             default:
-                                app(StartController::class)->notFound($telegram,$value['message']);
-                                break;
+                                return $this->notFound($value['message']);
                         }
                     }            
-                }
-            }
-            sleep(0.1);
-        }
     }
 
 
+
+
+
+    public function start($message)
+    {
+
+        $keyboard = [
+            [trans('start.Rules')],
+        ];
+        
+        $reply_markup = Telegram::replyKeyboardMarkup([
+            'keyboard' => $keyboard, 
+            'resize_keyboard' => true, 
+            'one_time_keyboard' => false
+        ]);
+
+        $html = "
+            <i>با سلام</i>
+        ";
+
+         return Telegram::sendMessage([
+            'chat_id' => $message['chat']['id'],
+            'reply_to_message_id' => $message['message_id'], 
+            'text' => $html, 
+            'parse_mode' => 'HTML',
+            'reply_markup' => $reply_markup
+        ]);
+        
+    }
+
+
+    public function notFound($message)
+    {
+        $keyboard = [
+            [trans('start.Rules')],
+        ];
+        
+        $reply_markup = Telegram::replyKeyboardMarkup([
+            'keyboard' => $keyboard, 
+            'resize_keyboard' => true, 
+            'one_time_keyboard' => false
+        ]);
+
+        $html="
+            <b>خطا</b>
+            <code>دستور ارسالی وجود ندارد</code>
+        ";
+
+        return Telegram::sendMessage([
+            'chat_id' => $message['chat']['id'],
+            'reply_to_message_id' => $message['message_id'], 
+            'text' => $html, 
+            'parse_mode' => 'HTML',
+            'reply_markup' => $reply_markup
+        ]);
+        
+    }
 
 
     

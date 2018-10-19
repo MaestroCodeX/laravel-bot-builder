@@ -1,8 +1,13 @@
 <?php   namespace App\Http\Aggregates\Start\Controller;
 
+use Telegram;
+use Exception;
 use App\Http\Controllers\Controller;
+use Illuminate\Validation\ValidationException;
+use App\Http\Aggregates\User\Controller\UserController;
 use App\Http\Aggregates\Bot\Contract\BotContract as Bot;
 use App\Http\Aggregates\User\Contract\UserContract as User;
+use App\Http\Aggregates\AdminBot\Controller\AdminBotController;
 
 class StartController extends Controller
 {
@@ -16,78 +21,26 @@ class StartController extends Controller
         $this->bot = $bot;
     }
 
-
-    public function start($telegram,$message)
+    public function init($botID)
     {
-        $keyboard = [
-            [trans('start.Rules')],
-            [trans('start.NewBot')],
-            [trans('start.ReportAbuse'), trans('start.MyBots')],
-            [trans('start.Help'),trans('start.SendComment')],
-        ];
-        
-        $reply_markup = $telegram->replyKeyboardMarkup([
-            'keyboard' => $keyboard, 
-            'resize_keyboard' => true, 
-            'one_time_keyboard' => false
-        ]);
-
-        $html = "
-            <i>با سلام</i>
-            <i>با استفاده از این ربات میتوانید😃👇</i>
-
-            <i>1-</i><code> بدون نیاز به برنامه نویسی، ربات خود را بسازید.</code>
-            <i>2-</i><code> به تمامی اعضا ربات پیام ارسال کنید.</code>
-            <i>3-</i><code> لیست اعضا ربات خود را دانلود کنید.</code>
-            <i>4-</i><code> با تک تک اعضا ربات گفت و گو کنید.</code>
-            <i>5-</i><code> عضویت اجباری برای کانال خودتان در ربات طراحی کنید.</code>
-            <i>6-</i><code> برای ربات دکمه با مطالب و طراحی دلخواه ایجاد کنید.</code>
-            <i>7-</i><code> برای ربات پاسخ خودکار به متن کاربران طراحی کنید.</code>
-            <i>8-</i><code> آمار اعضای خود را به صورت نمودار برسی کنید.</code>
-            <i>9-</i><code> برای ربات خود عکس پروفایل و متن توضیحات اضافه کنید.</code>
-            <i>10-</i><code> و از تمامی امکانات ربات لذت ببرید... !</code>
-
-            <i>برای شروع روی دکمه 'ساخت ربات جدید' کلیک کنید</i>
-        ";
-
-         return $telegram->sendMessage([
-            'chat_id' => $message['chat']['id'],
-            'reply_to_message_id' => $message['message_id'], 
-            'text' => $html, 
-            'parse_mode' => 'HTML',
-            'reply_markup' => $reply_markup
-        ]);
-        
+            $bot = $this->bot->getBot($botID);
+            if($bot !== null)
+            {
+                config(['telegram.bot_token' => $bot->token]);
+                $updates = Telegram::getWebhookUpdates();
+                $message_id = $updates->getMessage()->getFrom()->getId();
+                if(isset($bot->user->telegram_user_id) && !empty($bot->user->telegram_user_id) && $bot->user->telegram_user_id == $message_id)
+                {
+                    return app(UserController::class)->AdminUserBot($updates);
+                }
+                return app(UserController::class)->UserBot($updates);
+            }
+            $updates = Telegram::getWebhookUpdates();
+            return app(AdminBotController::class)->AdminBot($updates);
     }
+  
+           // $chat_id = $update->getMessage()->getChat()->getId();
+        // $text = $update->getMessage()->getText();
+        // $name = $update->getMessage()->getChat()->getFirstName();
 
-
-    public function notFound($telegram,$message)
-    {
-        $keyboard = [
-            [trans('start.Rules')],
-            [trans('start.NewBot')],
-            [trans('start.ReportAbuse'), trans('start.MyBots')],
-            [trans('start.Help'),trans('start.SendComment')],
-        ];
-        
-        $reply_markup = $telegram->replyKeyboardMarkup([
-            'keyboard' => $keyboard, 
-            'resize_keyboard' => true, 
-            'one_time_keyboard' => false
-        ]);
-
-        $html="
-            <b>خطا</b>
-            <code>دستور ارسالی وجود ندارد</code>
-        ";
-
-        return $telegram->sendMessage([
-            'chat_id' => $message['chat']['id'],
-            'reply_to_message_id' => $message['message_id'], 
-            'text' => $html, 
-            'parse_mode' => 'HTML',
-            'reply_markup' => $reply_markup
-        ]);
-        
-    }
 }
