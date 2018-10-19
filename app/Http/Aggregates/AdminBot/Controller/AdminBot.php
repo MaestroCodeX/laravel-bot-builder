@@ -57,7 +57,7 @@ class AdminBotController extends Controller
                             case trans('start.StartBot'):
                                 return $this->start($value['message']);
                             case trans('start.PreviusBtn'):
-                                return app(StartController::class)->start($value['message']);
+                                return $this->start($value['message']);
                             case trans('start.NewBot'):
                                 return app(BotController::class)->newBot($value['message']);
                             case trans('start.MyBots'):

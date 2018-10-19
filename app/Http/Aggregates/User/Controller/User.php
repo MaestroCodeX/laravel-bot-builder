@@ -223,7 +223,8 @@ class UserController extends Controller
     {
 
         $keyboard = [
-            [trans('start.Rules')],
+            [trans('start.buttons'),trans('start.tools')],
+            [trans('start.report'),trans('start.publicMessage')]
         ];
         
         $reply_markup = Telegram::replyKeyboardMarkup([
@@ -250,7 +251,8 @@ class UserController extends Controller
     public function notFound($message)
     {
         $keyboard = [
-            [trans('start.Rules')],
+            [trans('start.buttons'),trans('start.tools')],
+            [trans('start.report'),trans('start.publicMessage')]
         ];
         
         $reply_markup = Telegram::replyKeyboardMarkup([

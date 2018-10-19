@@ -18,5 +18,10 @@ return [
 	"CreateBotVideo" => "آموزش تصویری ساخت ربات در بات فادر",
 	"repeatSms" => "ارسال مجدد پیامک",
 	"createBotContinue" => 'تایید و ساخت بات',
-	"deleteBot" => "حذف ربات"
+	"deleteBot" => "حذف ربات",
+	"report" => 'آمار',
+	"publicMessage" => 'پیام همگانی',
+	"buttons" => 'دکمه ها',
+	"tools" => 'جعبه ابزار'
+
 ];
