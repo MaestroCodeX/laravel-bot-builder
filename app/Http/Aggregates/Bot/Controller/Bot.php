@@ -19,6 +19,12 @@ class BotController extends Controller
         $this->user = $user;
     }
 
+
+    public function botList()
+    {
+        return $this->bot->botList();
+    }
+
     public function newBot($telegram,$message)
     {
         $user = $this->user->get_user($message['chat']['id']);
@@ -128,6 +134,8 @@ class BotController extends Controller
             'user_id' => $user->id
         ];
         $this->bot->createBot($data);
+
+        $telegram->setWebhook(['url' => config('telegram.webhook_url').'/'.$botToken.'/webhook?bot_id='.$botInfo->getId()]);
 
         $keyboard = [
             [trans('start.PreviusBtn')]

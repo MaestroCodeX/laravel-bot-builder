@@ -1,9 +1,12 @@
 <?php   namespace App\Http\Aggregates\User\Controller;
 
+use Telegram\Bot\Api;
 use GuzzleHttp\Client;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Crypt;
+use App\Http\Aggregates\Bot\Controller\BotController;
 use App\Http\Aggregates\Bot\Contract\BotContract as Bot;
+use App\Http\Aggregates\Start\Controller\StartController;
 use App\Http\Aggregates\User\Contract\UserContract as User;
 
 class UserController extends Controller
@@ -192,4 +195,46 @@ class UserController extends Controller
     }
 
     
+
+    public function UserBot($token)
+    {
+        $telegram = new Api($token);
+        set_time_limit(0);
+        $last_update = 0;
+        while(true)
+        {
+            $updates = $telegram->getUpdates();
+            foreach ($updates as $key => $value) 
+            {     
+                if($last_update < $value['update_id'])
+                {
+                    $last_update = $value['update_id'];
+                    
+                    if(isset($value['message']['text']))
+                    {
+
+                        switch($value['message']['text'])
+                        {
+                            case trans('start.StartBot'):
+                                app(StartController::class)->start($telegram,$value['message']);
+                                break;
+                            case trans('start.PreviusBtn'):
+                                app(StartController::class)->start($telegram,$value['message']);
+                                break;  
+                            default:
+                                app(StartController::class)->notFound($telegram,$value['message']);
+                                break;
+                        }
+                    }            
+                }
+            }
+            sleep(0.1);
+        }
+    }
+
+
+
+
+    
+
 }

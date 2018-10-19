@@ -6,6 +6,11 @@ use App\Http\Aggregates\Bot\Contract\BotContract;
 class BotRepository implements BotContract
 {
 
+    public function botList()
+    {
+        return Bot::all();
+    }
+
     public function createBot($data)
     {
         return Bot::create($data);

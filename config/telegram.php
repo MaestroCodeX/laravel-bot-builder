@@ -41,6 +41,7 @@ return [
     */
     'http_client_handler' => null,
 
+    'webhook_url' => env('WEBHOOK_URL'),
     /*
     |--------------------------------------------------------------------------
     | Register Telegram Commands [Optional]
