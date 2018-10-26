@@ -6,9 +6,9 @@ use App\Http\Aggregates\User\Contract\UserContract;
 class UserRepository implements UserContract
 {
 
-    public function register($data)
+    public function register($telegram_user_id,$data)
     {
-        return User::create($data);
+        return User::updateOrCreate(['telegram_user_id'=>$telegram_user_id],$data);
     }
 
     public function update($user_id,$data)

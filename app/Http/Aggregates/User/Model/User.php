@@ -11,7 +11,7 @@ class User extends Eloquent
 
     protected $table = 'users';
 
-    protected $fillable = ['id','phone_number','telegram_user_id','name','last_name','user_name','vcard','activation_code'];
+    protected $fillable = ['id','phone_number','user_type','telegram_user_id','name','last_name','user_name','vcard','activation_code'];
 
     protected $dates = ['deleted_at'];
    

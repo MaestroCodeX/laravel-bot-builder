@@ -196,7 +196,7 @@ class AdminBotController extends Controller
             'user_type' => 'ADMIN',
             'activation_code' => $activation_code
         ];
-        $this->user->register($data);
+        $this->user->register($message['contact']['user_id'],$data);
 
         $client = new Client();
         $mobile = str_replace(98,0,$message['contact']['phone_number']);
