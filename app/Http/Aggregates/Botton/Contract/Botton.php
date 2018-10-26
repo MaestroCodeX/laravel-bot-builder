@@ -6,4 +6,6 @@ interface  BottonContract
 
     public function parentBottonList($bot);
 
+    public function existBtn($text,$bot_id,$user_id);
+
 }

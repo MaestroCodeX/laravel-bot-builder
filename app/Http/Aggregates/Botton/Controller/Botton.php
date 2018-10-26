@@ -76,9 +76,7 @@ class BottonController extends Controller
         }
         Cache::put($cacheKey, $message['text'], 30);
 
-        $keyboard = [  
-            [trans('start.PreviusBtn')]
-        ];
+        $keyboard = [];
 
         $reply_markup = Telegram::replyKeyboardMarkup([
             'keyboard' => $keyboard, 
@@ -163,6 +161,38 @@ class BottonController extends Controller
         ]);
     }
    
+
+
+
+
+
+    public function bottonActions($bot,$message,$botton)
+    {
+        $keyboard = [  
+            [trans('start.editBottonName'),trans('start.bottonAnswer')],
+            [trans('start.bottonChangePosition'),trans('start.bottonLink'),trans('start.deleteBotton')],
+            [trans('start.bottonSubMenu')],
+            [trans('start.PreviusBtn')]
+        ];
+
+        $reply_markup = Telegram::replyKeyboardMarkup([
+            'keyboard' => $keyboard, 
+            'resize_keyboard' => true, 
+            'one_time_keyboard' => false
+        ]);
+        
+        $html = "
+        <i>بخش مدیریت دکمه '".$message['text']."'</i>
+        ";
+        
+        return Telegram::sendMessage([
+            'chat_id' => $message['chat']['id'],
+            'reply_to_message_id' => $message['message_id'], 
+            'text' => $html, 
+            'parse_mode' => 'HTML',
+            'reply_markup' => $reply_markup
+        ]);
+    }
 
 
 }

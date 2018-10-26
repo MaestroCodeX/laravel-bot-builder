@@ -36,6 +36,8 @@ class UserController extends Controller
             $value = $updates;
             if(isset($value['message']['text']))
             {
+                $botton = $this->botton->existBtn($value['message']['text'],$bot->id,$value['message']['chat']['id']);
+
                 switch($value['message']['text'])
                 {
                     case trans('start.StartBot'):
@@ -53,7 +55,9 @@ class UserController extends Controller
                     case strpos($value['message']['text'],trans('start.newBouttonKey')) === 0:
                         return app(BottonController::class)->newBottonName($bot,$value['message']);    
                     case Cache::has($value['message']['chat']['id'].'_bottonName') :
-                        return app(BottonController::class)->insertNewParrentbotton($bot,$value['message']);            
+                        return app(BottonController::class)->insertNewParrentbotton($bot,$value['message']);    
+                    case !is_null($botton):
+                        return app(BottonController::class)->bottonActions($bot,$value['message'],$botton);           
                     default:
                         return $this->notFound($value['message']);
                 }

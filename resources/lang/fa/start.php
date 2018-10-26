@@ -23,6 +23,12 @@ return [
 	"publicMessage" => 'پیام همگانی',
 	"buttons" => 'دکمه ها',
 	"tools" => 'جعبه ابزار',
-	"newBouttonKey" => 'دکمه جدید'
+	"newBouttonKey" => 'دکمه جدید',
+	'editBottonName' => 'ویرایش عنوان دکمه',
+	'bottonAnswer' => 'پاسخ دکمه',
+	'bottonChangePosition' => 'تغییر مکان دکمه',
+	'bottonLink' => 'لینک دکمه',
+	'deleteBotton' => 'حذف دکمه',
+	'bottonSubMenu' => '+ مدیریت زیرمنو',
 
 ];
