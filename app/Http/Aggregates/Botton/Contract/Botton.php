@@ -2,6 +2,8 @@
 
 interface  BottonContract
 {
+    public function createBotton($data);
+
     public function parentBottonList($bot);
 
 }

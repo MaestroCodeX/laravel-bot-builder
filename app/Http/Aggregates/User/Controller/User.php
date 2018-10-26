@@ -4,12 +4,15 @@ use Telegram;
 use Telegram\Bot\Api;
 use GuzzleHttp\Client;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Crypt;
 use App\Http\Aggregates\Bot\Controller\BotController;
 use App\Http\Aggregates\Bot\Contract\BotContract as Bot;
 use App\Http\Aggregates\Start\Controller\StartController;
+use App\Http\Aggregates\Botton\Controller\BottonController;
 use App\Http\Aggregates\User\Contract\UserContract as User;
 use App\Http\Aggregates\Botton\Contract\BottonContract as Botton;
+
 
 class UserController extends Controller
 {
@@ -46,7 +49,11 @@ class UserController extends Controller
                     case trans('start.publicMessage'):
                         return $this->publicMessage($value['message']);
                     case trans('start.buttons'):
-                        return $this->buttons($bot,$value['message']);                 
+                        return app(BottonController::class)->buttons($bot,$value['message']);    
+                    case strpos($value['message']['text'],trans('start.newBouttonKey')) === 0:
+                        return app(BottonController::class)->newBottonName($bot,$value['message']);    
+                    case Cache::has($value['message']['chat']['id'].'_bottonName') :
+                        return app(BottonController::class)->insertNewParrentbotton($bot,$value['message']);            
                     default:
                         return $this->notFound($value['message']);
                 }
@@ -164,40 +171,7 @@ class UserController extends Controller
 
 
 
-    public function buttons($bot,$message)
-    {
-        $bottons = $this->botton->parentBottonList($bot);
-
-        foreach($bottons as $botton)
-        {
-
-        }
-
-        // [trans('start.newBouttonKey')." 0"],
-
-        $keyboard = [  
-            [trans('start.PreviusBtn')]
-        ];
-
-
-        $reply_markup = Telegram::replyKeyboardMarkup([
-            'keyboard' => $keyboard, 
-            'resize_keyboard' => true, 
-            'one_time_keyboard' => false
-        ]);
-        
-        $html = "
-            <i>بخش مدیریت دکمه ها</i>
-        ";
-        
-        return Telegram::sendMessage([
-            'chat_id' => $message['chat']['id'],
-            'reply_to_message_id' => $message['message_id'], 
-            'text' => $html, 
-            'parse_mode' => 'HTML',
-            'reply_markup' => $reply_markup
-        ]);
-    }
+  
 
     
 
