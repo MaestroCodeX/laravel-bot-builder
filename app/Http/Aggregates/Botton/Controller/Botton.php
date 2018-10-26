@@ -76,12 +76,8 @@ class BottonController extends Controller
         }
         Cache::put($cacheKey, $message['text'], 30);
 
-        $keyboard = [];
-
         $reply_markup = Telegram::replyKeyboardMarkup([
-            'keyboard' => $keyboard, 
-            'resize_keyboard' => true, 
-            'one_time_keyboard' => false
+            'remove_keyboard' => true, 
         ]);
         
         $html = "
@@ -215,6 +211,16 @@ class BottonController extends Controller
 
     public function bottonActions($bot,$message,$botton)
     {
+            if(!is_null($botton))
+            {
+                    $cacheKey = $message['chat']['id'].'_bottonAction';    
+                    if(Cache::has($cacheKey))
+                    {   
+                        Cache::forget($cacheKey);
+                    }
+                    Cache::put($cacheKey, $botton->id, 30);
+            }
+
         $keyboard = [  
             [trans('start.editBottonName'),trans('start.bottonAnswer')],
             [trans('start.bottonChangePosition'),trans('start.bottonLink'),trans('start.deleteBotton')],

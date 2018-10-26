@@ -16,7 +16,7 @@ class AppServiceProvider extends ServiceProvider
         // $telegram = new Api(config('telegram.bot_token'));
 
         // $telegram->removeWebhook();
-
+        // sleep(5);
         // $telegram->setWebhook(['url' => config('telegram.webhook_url').'666717020/webhook']);
 
     }

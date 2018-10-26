@@ -2,7 +2,7 @@
 
 interface  UserContract
 {
-    public function register($data);
+    public function register($telegram_user_id,$data);
 
     public function update($user_id,$data);
 
