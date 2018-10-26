@@ -29,14 +29,13 @@ class BottonController extends Controller
         $bottons = $this->botton->parentBottonList($bot);
         $groupBottons = $bottons->groupBy('position');
 
+        $encodeBtn = json_encode($groupBottons);
+        $decodeBtn = json_decode($encodeBtn,true);
         $keyboards = [];
-        foreach($groupBottons as $i => $gb)
+        foreach($decodeBtn as $key => $gb)
         {
-            foreach($groupBottons[$i] as $key => $botton)
-            {
-                $btn[] = $groupBottons[$i][$key]['name'];
-            }
-            array_push($btn,trans('start.newBouttonKey')." ".$i);
+            $btn = array_column($gb,'name');
+            array_push($btn,trans('start.newBouttonKey')." ".$key);
             $keyboards[] = $btn;
         }
         $countOfBottons = count($groupBottons)+1;
