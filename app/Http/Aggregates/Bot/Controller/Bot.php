@@ -7,6 +7,8 @@ use Illuminate\Support\Facades\Cache;
 use App\Http\Aggregates\User\Controller\UserController;
 use App\Http\Aggregates\Bot\Contract\BotContract as Bot;
 use App\Http\Aggregates\User\Contract\UserContract as User;
+use App\Http\Aggregates\AdminBot\Controller\AdminBotController;
+
 class BotController extends Controller
 {
 
@@ -110,7 +112,7 @@ class BotController extends Controller
         $user = $this->user->get_user($message['chat']['id']);
         if($user == null)
         {   
-            app(UserController::class)->userNotFound($message);
+            app(AdminBotController::class)->userNotFound($message);
             config(['telegram.bot_token' => env('TELEGRAM_BOT_TOKEN')]);
             return 'DONE';
         }

@@ -39,5 +39,4 @@ class BotRepository implements BotContract
     {
         return Bot::where('username','=',$value)->delete();
     }
-
 }

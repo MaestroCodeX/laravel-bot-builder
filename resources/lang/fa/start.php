@@ -22,6 +22,7 @@ return [
 	"report" => 'آمار',
 	"publicMessage" => 'پیام همگانی',
 	"buttons" => 'دکمه ها',
-	"tools" => 'جعبه ابزار'
+	"tools" => 'جعبه ابزار',
+	"newBouttonKey" => 'دکمه جدید'
 
 ];

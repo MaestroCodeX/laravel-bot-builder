@@ -7,4 +7,9 @@ interface  UserContract
     public function update($user_id,$data);
 
     public function get_user($user_id);
+
+    public function botUsersList($bot);
+
+    public function botUsersListCount($bot);
+
 }

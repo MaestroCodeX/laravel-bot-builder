@@ -158,6 +158,7 @@ return [
         App\Providers\AuthServiceProvider::class,
         App\Http\Aggregates\User\Provider\UserServiceProvider::class,
         App\Http\Aggregates\Bot\Provider\BotServiceProvider::class,
+        App\Http\Aggregates\Botton\Provider\BottonServiceProvider::class,
 
         // App\Providers\BroadcastServiceProvider::class,
         App\Providers\EventServiceProvider::class,

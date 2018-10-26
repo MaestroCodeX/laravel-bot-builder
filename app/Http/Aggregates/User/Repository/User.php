@@ -20,4 +20,15 @@ class UserRepository implements UserContract
     {
         return User::where('telegram_user_id',$user_id)->first();
     }
+
+    public function botUsersList($bot)
+    {
+        return User::where('parent_user_id',$bot->user->id)->orderBy('created_at','DESC')->take(30)->get(['username','phone_number']);
+    }
+
+    public function botUsersListCount($bot)
+    {
+        return User::where('parent_user_id',$bot->user->id)->count();
+    }
+
 }

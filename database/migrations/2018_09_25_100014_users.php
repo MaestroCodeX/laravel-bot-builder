@@ -23,6 +23,9 @@ class Users extends Migration
             $table->string('username',100)->nullable()->index();
             $table->text('vcard')->nullable();
             $table->string('activation_code',300)->nullable();
+            $table->enum('user_type',['SUPERADMIN','ADMIN','USER']);
+            $table->unsignedInteger('parent_user_id')->nullable();
+            $table->foreign('parent_user_id')->references('id')->on('users');
             $table->timestamps();
             $table->softDeletes();
         });

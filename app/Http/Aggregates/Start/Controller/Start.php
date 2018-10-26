@@ -31,9 +31,9 @@ class StartController extends Controller
                 $message_id = $updates->getMessage()->getFrom()->getId();
                 if(isset($bot->user->telegram_user_id) && !empty($bot->user->telegram_user_id) && $bot->user->telegram_user_id == $message_id)
                 {
-                    return app(UserController::class)->AdminUserBot($updates);
+                    return app(UserController::class)->AdminUserBot($bot,$updates);
                 }
-                return app(UserController::class)->UserBot($updates);
+                return app(UserController::class)->UserBot($bot,$updates);
             }
             $updates = Telegram::getWebhookUpdates();
             return app(AdminBotController::class)->AdminBot($updates);
