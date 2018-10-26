@@ -38,6 +38,16 @@ class UserController extends Controller
             {
                 $botton = $this->botton->existBtn($value['message']['text'],$bot->id,$value['message']['chat']['id']);
 
+                if(!is_null($botton))
+                {
+                    $cacheKey = $value['message']['chat']['id'].'_bottonAction';    
+                    if(Cache::has($cacheKey))
+                    {   
+                        Cache::forget($cacheKey);
+                    }
+                    Cache::put($cacheKey, $botton->id, 30);
+                }
+
                 switch($value['message']['text'])
                 {
                     case trans('start.StartBot'):
@@ -51,13 +61,15 @@ class UserController extends Controller
                     case trans('start.publicMessage'):
                         return $this->publicMessage($value['message']);
                     case trans('start.buttons'):
-                        return app(BottonController::class)->buttons($bot,$value['message']);    
+                        return app(BottonController::class)->buttons($bot,$value['message'],null);    
                     case strpos($value['message']['text'],trans('start.newBouttonKey')) === 0:
                         return app(BottonController::class)->newBottonName($bot,$value['message']);    
                     case Cache::has($value['message']['chat']['id'].'_bottonName') :
                         return app(BottonController::class)->insertNewParrentbotton($bot,$value['message']);    
                     case !is_null($botton):
-                        return app(BottonController::class)->bottonActions($bot,$value['message'],$botton);           
+                        return app(BottonController::class)->bottonActions($bot,$value['message'],$botton);   
+                    case trans('start.bottonSubMenu'):
+                        return app(BottonController::class)->buttons($bot,$value['message'],Cache::get($value['message']['chat']['id'].'_bottonAction'));          
                     default:
                         return $this->notFound($value['message']);
                 }
