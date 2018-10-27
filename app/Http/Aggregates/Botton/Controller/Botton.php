@@ -26,7 +26,9 @@ class BottonController extends Controller
 
     public function buttons($bot,$message, $parent_id = null)
     {
-        $bottons = $this->botton->bottonList($bot,$parent_id);
+        $cacheGet = (isset($parent_id) && !empty($parent_id)) ? json_decode($parent_id) : null;
+        $parentId = (isset($cacheGet) && !empty($cacheGet)) ? $cacheGet[0] : null;
+        $bottons = $this->botton->bottonList($bot,$parentId);
         $groupBottons = $bottons->groupBy('position');
 
         $encodeBtn = json_encode($groupBottons);
@@ -103,9 +105,10 @@ class BottonController extends Controller
         $btnActionCacheKey = $message['chat']['id'].'_bottonAction';    
         if(Cache::has($btnActionCacheKey))
         {   
-            $parent_id = Cache::get($btnActionCacheKey);
+            $cacheGet = Cache::get($btnActionCacheKey);
+            $parent_id = json_decode($cacheGet);
         }
-        $parentId = (isset($parent_id) && !empty($parent_id)) ? $parent_id : null;
+        $parentId = (isset($parent_id) && !empty($parent_id)) ? $parent_id[0] : null;
 
         $botton = $this->botton->existParentBtn($message['text'],$bot->id,$message['chat']['id'],$parentId);
         if(!is_null($botton))
@@ -218,7 +221,7 @@ class BottonController extends Controller
                     {   
                         Cache::forget($cacheKey);
                     }
-                    Cache::put($cacheKey, $botton->id, 30);
+                    Cache::put($cacheKey, json_encode([$botton->id,$botton->parent_id]), 30);
             }
 
         $keyboard = [  

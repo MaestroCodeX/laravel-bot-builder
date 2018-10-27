@@ -36,9 +36,16 @@ class UserController extends Controller
             $value = $updates;
             if(isset($value['message']['text']))
             {
-                $botton = $this->botton->existParentBtn($value['message']['text'],$bot->id,$value['message']['chat']['id']);
 
-
+                $btnActionCacheKey = $value['message']['chat']['id'].'_bottonAction';    
+                if(Cache::has($btnActionCacheKey))
+                {   
+                    $cacheGet = Cache::get($btnActionCacheKey);
+                    $parent_id = json_decode($cacheGet);
+                }
+                $parentId = (isset($parent_id) && !empty($parent_id)) ? $parent_id[0] : null;
+        
+                $botton = $this->botton->existParentBtn($value['message']['text'],$bot->id,$value['message']['chat']['id'],$parentId);
 
                 switch($value['message']['text'])
                 {

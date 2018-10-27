@@ -68,6 +68,8 @@ class AdminBotController extends Controller
                                 return $this->repeatSms($value['message']);
                             case trans('start.createBotContinue'):
                                 return app(BotController::class)->createBot($value['message']);
+                            case trans('start.CreateBotVideo'):
+                                return app(BotController::class)->createBot($value['message']);
                             case strpos($value['message']['text'],'@') === 0:
                                 return app(BotController::class)->BotAction($value['message']);
                             case trans('start.deleteBot'):
