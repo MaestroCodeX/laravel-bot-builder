@@ -42,4 +42,22 @@ class BottonRepository implements BottonContract
     }
 
 
+
+    public function updateBtn($botton_id,$name)
+    {
+        return Botton::where('id',$botton_id)->update(['name'=>$name]);
+    }
+
+
+    public function deleteBtn($botton_id)
+    {
+        return Botton::where('id',$botton_id)->delete();
+    }
+
+
+    public function updatePosition($botton_id,$position)
+    {
+        return Botton::where('id',$botton_id)->update(['position'=>$position]);
+    }
+
 }

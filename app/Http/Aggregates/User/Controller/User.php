@@ -41,10 +41,17 @@ class UserController extends Controller
                 if(Cache::has($btnActionCacheKey))
                 {   
                     $cacheGet = Cache::get($btnActionCacheKey);
-                    $parent_id = json_decode($cacheGet);
+                    $btnInfo = json_decode($cacheGet);
                 }
-                $parentId = (isset($parent_id) && !empty($parent_id)) ? $parent_id[0] : null;
-        
+                $parentId = (isset($btnInfo) && !empty($btnInfo)) ? $btnInfo[0] : null;
+
+                $alert = $value['message']['chat']['id'].'_botAlert';    
+                if(Cache::has($alert))
+                {   
+                    $alertGet = Cache::get($alert);
+                }
+                $action = (isset($alertGet) && !empty($alertGet)) ? $alertGet : null;
+
                 $botton = $this->botton->existParentBtn($value['message']['text'],$bot->id,$value['message']['chat']['id'],$parentId);
 
                 switch($value['message']['text'])
@@ -65,10 +72,25 @@ class UserController extends Controller
                         return app(BottonController::class)->newBottonName($bot,$value['message']);    
                     case Cache::has($value['message']['chat']['id'].'_bottonName') :
                         return app(BottonController::class)->insertNewParrentbotton($bot,$value['message']);    
-                    case !is_null($botton):
-                        return app(BottonController::class)->bottonActions($bot,$value['message'],$botton);   
+ 
                     case trans('start.bottonSubMenu'):
-                        return app(BottonController::class)->buttons($bot,$value['message'],Cache::get($value['message']['chat']['id'].'_bottonAction'));          
+                        return app(BottonController::class)->buttons($bot,$value['message'],Cache::get($value['message']['chat']['id'].'_bottonAction'));
+                    
+                    case trans('start.bottonChangePosition'):
+                        return app(BottonController::class)->getChangePosition($bot,$value['message'],$botton);          
+                    case $action == 'poistionChanged':
+                        return app(BottonController::class)->changePosition($bot,$value['message'],$botton);
+
+
+                    case trans('start.deleteBotton'):
+                        return app(BottonController::class)->deleteBotton($bot,$value['message'],$botton); 
+                        
+                    case trans('start.editBottonName'):
+                        return app(BottonController::class)->getEditBotton($bot,$value['message'],$botton); 
+                    case $action == 'editted':
+                        return app(BottonController::class)->editBotton($bot,$value['message'],$botton); 
+                    case !is_null($botton):
+                        return app(BottonController::class)->bottonActions($bot,$value['message'],$botton);        
                     default:
                         return $this->notFound($value['message']);
                 }
@@ -79,7 +101,21 @@ class UserController extends Controller
 
     public function start($message)
     {
-
+        $cacheKey = $message['chat']['id'].'_bottonName';
+        $btnActionCacheKey = $message['chat']['id'].'_bottonAction';   
+        $cacheKeys = $message['chat']['id'].'_botAlert';    
+        if(Cache::has($cacheKey))
+        {   
+            Cache::forget($cacheKey);
+        }
+        if(Cache::has($btnActionCacheKey))
+        {   
+            Cache::forget($btnActionCacheKey);
+        }
+        if(Cache::has($cacheKeys))
+        {   
+            Cache::forget($cacheKeys);
+        }
         $keyboard = [
             [trans('start.buttons'),trans('start.tools')],
             [trans('start.report'),trans('start.publicMessage')]
@@ -108,6 +144,16 @@ class UserController extends Controller
 
     public function notFound($message)
     {
+        $cacheKey = $message['chat']['id'].'_bottonName';
+        $btnActionCacheKey = $message['chat']['id'].'_bottonAction';    
+        if(Cache::has($cacheKey))
+        {   
+            Cache::forget($cacheKey);
+        }
+        if(Cache::has($btnActionCacheKey))
+        {   
+            Cache::forget($btnActionCacheKey);
+        }
         $keyboard = [
             [trans('start.buttons'),trans('start.tools')],
             [trans('start.report'),trans('start.publicMessage')]

@@ -214,15 +214,15 @@ class BottonController extends Controller
 
     public function bottonActions($bot,$message,$botton)
     {
-            if(!is_null($botton))
-            {
-                    $cacheKey = $message['chat']['id'].'_bottonAction';    
-                    if(Cache::has($cacheKey))
-                    {   
-                        Cache::forget($cacheKey);
-                    }
-                    Cache::put($cacheKey, json_encode([$botton->id,$botton->parent_id]), 30);
+        if(!is_null($botton))
+        {
+            $cacheKey = $message['chat']['id'].'_bottonAction';    
+            if(Cache::has($cacheKey))
+            {   
+                Cache::forget($cacheKey);
             }
+            Cache::put($cacheKey, json_encode([$botton->id,$botton->parent_id]), 30);
+        }
 
         $keyboard = [  
             [trans('start.editBottonName'),trans('start.bottonAnswer')],
@@ -252,7 +252,183 @@ class BottonController extends Controller
 
 
 
+    public function getEditBotton($bot,$message,$botton)
+    {
+        $cacheKey = $message['chat']['id'].'_botAlert';    
+        if(Cache::has($cacheKey))
+        {   
+            Cache::forget($cacheKey);
+        }
+        Cache::put($cacheKey, 'editted', 30);
 
+        $keyboard = [  
+            [trans('start.PreviusBtn')]
+        ];
+
+        $reply_markup = Telegram::replyKeyboardMarkup([
+            'keyboard' => $keyboard, 
+            'resize_keyboard' => true, 
+            'one_time_keyboard' => false
+        ]);
+        
+        $html = "
+        <i>نام جدید را وارد نمایید</i>
+        ";
+        
+        return Telegram::sendMessage([
+            'chat_id' => $message['chat']['id'],
+            'reply_to_message_id' => $message['message_id'], 
+            'text' => $html, 
+            'parse_mode' => 'HTML',
+            'reply_markup' => $reply_markup
+        ]);
+    }
+
+
+    public function editBotton($bot,$message,$botton)
+    {
+        $btnActionCacheKey = $message['chat']['id'].'_bottonAction';    
+        if(Cache::has($btnActionCacheKey))
+        {   
+            $cacheGet = Cache::get($btnActionCacheKey);
+            $parent_id = json_decode($cacheGet);
+        }
+        $bottonId = (isset($parent_id) && !empty($parent_id)) ? $parent_id[0] : null;
+
+        $this->botton->updateBtn($bottonId,$message['text']);
+
+        $keyboard = [  
+            [trans('start.PreviusBtn')]
+        ];
+
+        $reply_markup = Telegram::replyKeyboardMarkup([
+            'keyboard' => $keyboard, 
+            'resize_keyboard' => true, 
+            'one_time_keyboard' => false
+        ]);
+        
+        $html = "
+        <i>نام دکمه با موفقیت تغییر کرد</i>
+        ";
+        
+        return Telegram::sendMessage([
+            'chat_id' => $message['chat']['id'],
+            'reply_to_message_id' => $message['message_id'], 
+            'text' => $html, 
+            'parse_mode' => 'HTML',
+            'reply_markup' => $reply_markup
+        ]);
+    }
+
+
+
+
+    public function deleteBotton($bot,$message,$botton)
+    {
+        $btnActionCacheKey = $message['chat']['id'].'_bottonAction';    
+        if(Cache::has($btnActionCacheKey))
+        {   
+            $cacheGet = Cache::get($btnActionCacheKey);
+            $parent_id = json_decode($cacheGet);
+        }
+        $bottonId = (isset($parent_id) && !empty($parent_id)) ? $parent_id[0] : null;
+
+        $this->botton->deleteBtn($bottonId);
+
+        $keyboard = [  
+            [trans('start.PreviusBtn')]
+        ];
+
+        $reply_markup = Telegram::replyKeyboardMarkup([
+            'keyboard' => $keyboard, 
+            'resize_keyboard' => true, 
+            'one_time_keyboard' => false
+        ]);
+        
+        $html = "
+        <i>دکمه مورد نظر با موفقیت حذف شد</i>
+        ";
+        
+        return Telegram::sendMessage([
+            'chat_id' => $message['chat']['id'],
+            'reply_to_message_id' => $message['message_id'], 
+            'text' => $html, 
+            'parse_mode' => 'HTML',
+            'reply_markup' => $reply_markup
+        ]);
+    }
+
+
+
+
+    public function getChangePosition($bot,$message,$botton)
+    {
+        $cacheKey = $message['chat']['id'].'_botAlert';    
+        if(Cache::has($cacheKey))
+        {   
+            Cache::forget($cacheKey);
+        }
+        Cache::put($cacheKey, 'poistionChanged', 30);
+
+        $keyboard = [  
+            [trans('start.PreviusBtn')]
+        ];
+
+        $reply_markup = Telegram::replyKeyboardMarkup([
+            'keyboard' => $keyboard, 
+            'resize_keyboard' => true, 
+            'one_time_keyboard' => false
+        ]);
+        
+        $html = "
+        <i>موقعیت جدید دکمه را به صورت عدد انگلیسی وارد نمایید</i>
+        ";
+        
+        return Telegram::sendMessage([
+            'chat_id' => $message['chat']['id'],
+            'reply_to_message_id' => $message['message_id'], 
+            'text' => $html, 
+            'parse_mode' => 'HTML',
+            'reply_markup' => $reply_markup
+        ]);
+    }
 
     
+
+    public function changePosition($bot,$message,$botton)
+    {
+        $btnActionCacheKey = $message['chat']['id'].'_bottonAction';    
+        if(Cache::has($btnActionCacheKey))
+        {   
+            $cacheGet = Cache::get($btnActionCacheKey);
+            $parent_id = json_decode($cacheGet);
+        }
+        $bottonId = (isset($parent_id) && !empty($parent_id)) ? $parent_id[0] : null;
+
+        $this->botton->updatePosition($bottonId,$message['text']);
+
+        $keyboard = [  
+            [trans('start.PreviusBtn')]
+        ];
+
+        $reply_markup = Telegram::replyKeyboardMarkup([
+            'keyboard' => $keyboard, 
+            'resize_keyboard' => true, 
+            'one_time_keyboard' => false
+        ]);
+        
+        $html = "
+        <i>موقعیت دکمه آپدیت شد</i>
+        ";
+        
+        return Telegram::sendMessage([
+            'chat_id' => $message['chat']['id'],
+            'reply_to_message_id' => $message['message_id'], 
+            'text' => $html, 
+            'parse_mode' => 'HTML',
+            'reply_markup' => $reply_markup
+        ]);
+    }
+
+
 }
