@@ -297,6 +297,11 @@ class BottonController extends Controller
 
         $this->botton->updateBtn($bottonId,$message['text']);
 
+        $cacheKeys = $message['chat']['id'].'_botAlert';    
+        if(Cache::has($cacheKeys))
+        {   
+            Cache::forget($cacheKeys);
+        }
         $keyboard = [  
             [trans('start.PreviusBtn')]
         ];
@@ -407,6 +412,12 @@ class BottonController extends Controller
 
         $this->botton->updatePosition($bottonId,$message['text']);
 
+        $cacheKeys = $message['chat']['id'].'_botAlert';    
+        if(Cache::has($cacheKeys))
+        {   
+            Cache::forget($cacheKeys);
+        }
+        
         $keyboard = [  
             [trans('start.PreviusBtn')]
         ];

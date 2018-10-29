@@ -76,6 +76,14 @@ class UserController extends Controller
                     case trans('start.bottonSubMenu'):
                         return app(BottonController::class)->buttons($bot,$value['message'],Cache::get($value['message']['chat']['id'].'_bottonAction'));
                     
+
+                    case trans('start.editBottonName'):
+                        return app(BottonController::class)->getEditBotton($bot,$value['message'],$botton); 
+                    case $action == 'editted':
+                        return app(BottonController::class)->editBotton($bot,$value['message'],$botton); 
+
+
+
                     case trans('start.bottonChangePosition'):
                         return app(BottonController::class)->getChangePosition($bot,$value['message'],$botton);          
                     case $action == 'poistionChanged':
@@ -85,10 +93,8 @@ class UserController extends Controller
                     case trans('start.deleteBotton'):
                         return app(BottonController::class)->deleteBotton($bot,$value['message'],$botton); 
                         
-                    case trans('start.editBottonName'):
-                        return app(BottonController::class)->getEditBotton($bot,$value['message'],$botton); 
-                    case $action == 'editted':
-                        return app(BottonController::class)->editBotton($bot,$value['message'],$botton); 
+              
+
                     case !is_null($botton):
                         return app(BottonController::class)->bottonActions($bot,$value['message'],$botton);        
                     default:
@@ -145,7 +151,8 @@ class UserController extends Controller
     public function notFound($message)
     {
         $cacheKey = $message['chat']['id'].'_bottonName';
-        $btnActionCacheKey = $message['chat']['id'].'_bottonAction';    
+        $btnActionCacheKey = $message['chat']['id'].'_bottonAction';   
+        $cacheKeys = $message['chat']['id'].'_botAlert';    
         if(Cache::has($cacheKey))
         {   
             Cache::forget($cacheKey);
@@ -153,6 +160,10 @@ class UserController extends Controller
         if(Cache::has($btnActionCacheKey))
         {   
             Cache::forget($btnActionCacheKey);
+        }
+        if(Cache::has($cacheKeys))
+        {   
+            Cache::forget($cacheKeys);
         }
         $keyboard = [
             [trans('start.buttons'),trans('start.tools')],
