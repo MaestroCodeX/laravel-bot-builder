@@ -1,12 +1,18 @@
 <?php namespace App\Http\Aggregate\Botton\Repository;
 
 use App\Http\Aggregates\Botton\Model\Botton;
+use App\Http\Aggregates\Botton\Model\BottonData;
 use App\Http\Aggregates\Botton\Contract\BottonContract;
 
 class BottonRepository implements BottonContract
 {
 
 
+    public function createBottonData($data)
+    {
+        return BottonData::create($data);
+    }
+  
     public function createBotton($data)
     {
         return Botton::create($data);

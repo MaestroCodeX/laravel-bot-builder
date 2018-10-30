@@ -34,23 +34,26 @@ class UserController extends Controller
     public function AdminUserBot($bot,$updates)
     {
             $value = $updates;
+
+            $btnActionCacheKey = $value['message']['chat']['id'].'_bottonAction';    
+            if(Cache::has($btnActionCacheKey))
+            {   
+                $cacheGet = Cache::get($btnActionCacheKey);
+                $btnInfo = json_decode($cacheGet);
+            }
+            $parentId = (isset($btnInfo) && !empty($btnInfo)) ? $btnInfo[0] : null;
+
+            $alert = $value['message']['chat']['id'].'_botAlert';    
+            if(Cache::has($alert))
+            {   
+                $alertGet = Cache::get($alert);
+            }
+            $action = (isset($alertGet) && !empty($alertGet)) ? $alertGet : null;
+
+
+            
             if(isset($value['message']['text']))
             {
-
-                $btnActionCacheKey = $value['message']['chat']['id'].'_bottonAction';    
-                if(Cache::has($btnActionCacheKey))
-                {   
-                    $cacheGet = Cache::get($btnActionCacheKey);
-                    $btnInfo = json_decode($cacheGet);
-                }
-                $parentId = (isset($btnInfo) && !empty($btnInfo)) ? $btnInfo[0] : null;
-
-                $alert = $value['message']['chat']['id'].'_botAlert';    
-                if(Cache::has($alert))
-                {   
-                    $alertGet = Cache::get($alert);
-                }
-                $action = (isset($alertGet) && !empty($alertGet)) ? $alertGet : null;
 
                 $botton = $this->botton->existParentBtn($value['message']['text'],$bot->id,$value['message']['chat']['id'],$parentId);
 
@@ -71,36 +74,37 @@ class UserController extends Controller
                     case strpos($value['message']['text'],trans('start.newBouttonKey')) === 0:
                         return app(BottonController::class)->newBottonName($bot,$value['message']);    
                     case Cache::has($value['message']['chat']['id'].'_bottonName') :
-                        return app(BottonController::class)->insertNewParrentbotton($bot,$value['message']);    
- 
+                        return app(BottonController::class)->insertNewParrentbotton($bot,$value['message']);     
                     case trans('start.bottonSubMenu'):
                         return app(BottonController::class)->buttons($bot,$value['message'],Cache::get($value['message']['chat']['id'].'_bottonAction'));
-                    
-
                     case trans('start.editBottonName'):
                         return app(BottonController::class)->getEditBotton($bot,$value['message'],$botton); 
                     case $action == 'editted':
                         return app(BottonController::class)->editBotton($bot,$value['message'],$botton); 
-
-
-
                     case trans('start.bottonChangePosition'):
                         return app(BottonController::class)->getChangePosition($bot,$value['message'],$botton);          
                     case $action == 'poistionChanged':
                         return app(BottonController::class)->changePosition($bot,$value['message'],$botton);
-
-
                     case trans('start.deleteBotton'):
                         return app(BottonController::class)->deleteBotton($bot,$value['message'],$botton); 
-                        
-              
-
+                    case trans('start.bottonAnswer'):
+                        return app(BottonController::class)->bottonAnswerBotton($bot,$value['message'],$botton);   
+                    case trans('start.showArticle'):
+                        return app(BottonController::class)->showArticle‌Botton($bot,$value['message'],$botton);      
+                    case Cache::has($value['message']['chat']['id'].'_bottonArticle'):
+                        return app(BottonController::class)->getArticle‌Botton($bot,$value['message']); 
                     case !is_null($botton):
                         return app(BottonController::class)->bottonActions($bot,$value['message'],$botton);        
                     default:
                         return $this->notFound($value['message']);
                 }
-            }            
+            }    
+            
+            
+            if(Cache::has($value['message']['chat']['id'].'_bottonArticle'))
+            {
+                return app(BottonController::class)->getArticle‌Botton($bot,$value['message']); 
+            }
     }
 
 
@@ -110,6 +114,7 @@ class UserController extends Controller
         $cacheKey = $message['chat']['id'].'_bottonName';
         $btnActionCacheKey = $message['chat']['id'].'_bottonAction';   
         $cacheKeys = $message['chat']['id'].'_botAlert';    
+        $bottonArticle = $message['chat']['id'].'_bottonArticle';    
         if(Cache::has($cacheKey))
         {   
             Cache::forget($cacheKey);
@@ -121,6 +126,10 @@ class UserController extends Controller
         if(Cache::has($cacheKeys))
         {   
             Cache::forget($cacheKeys);
+        }
+        if(Cache::has($bottonArticle))
+        {   
+            Cache::forget($bottonArticle);
         }
         $keyboard = [
             [trans('start.buttons'),trans('start.tools')],
@@ -153,6 +162,7 @@ class UserController extends Controller
         $cacheKey = $message['chat']['id'].'_bottonName';
         $btnActionCacheKey = $message['chat']['id'].'_bottonAction';   
         $cacheKeys = $message['chat']['id'].'_botAlert';    
+        $bottonArticle = $message['chat']['id'].'_bottonArticle';    
         if(Cache::has($cacheKey))
         {   
             Cache::forget($cacheKey);
@@ -164,6 +174,10 @@ class UserController extends Controller
         if(Cache::has($cacheKeys))
         {   
             Cache::forget($cacheKeys);
+        }
+        if(Cache::has($bottonArticle))
+        {   
+            Cache::forget($bottonArticle);
         }
         $keyboard = [
             [trans('start.buttons'),trans('start.tools')],

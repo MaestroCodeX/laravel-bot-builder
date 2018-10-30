@@ -30,5 +30,7 @@ return [
 	'bottonLink' => 'لینک دکمه',
 	'deleteBotton' => 'حذف دکمه',
 	'bottonSubMenu' => '+ مدیریت زیرمنو',
-
+	'showArticle' => 'نمایش مطلب',
+	'createFaq' => 'طراحی فرم سوال',
+	'doneCreateArticle' => 'اتمام'
 ];
