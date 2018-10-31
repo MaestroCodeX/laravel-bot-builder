@@ -32,5 +32,8 @@ return [
 	'bottonSubMenu' => '+ مدیریت زیرمنو',
 	'showArticle' => 'نمایش مطلب',
 	'createFaq' => 'طراحی فرم سوال',
-	'doneCreateArticle' => 'اتمام'
+	'doneCreateArticle' => 'اتمام',
+	'ascArticleSort' => 'قدیمی به جدید',
+	'descArticleSort' => 'جدید به قدیم',
+
 ];

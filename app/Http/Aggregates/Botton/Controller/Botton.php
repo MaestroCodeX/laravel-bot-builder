@@ -560,10 +560,10 @@ class BottonController extends Controller
                 copy($uri,storage_path('files').'/'.basename($response['file_path']));
             
                 $data = [
-                    'type' => $message['document']['mime_type'],
+                    'type' => 'document',
                     'fileID' => $message['document']['file_id'],
                     'fileSize' => $message['document']['file_size'],
-                    'sort' => 'asc',
+                    'sort' => 'ASC',
                     'data' => storage_path('files').'/'.basename($response['file_path']),
                     'bot_id' => $bot->id,
                     'botton_id' => $cacheGet
@@ -574,45 +574,111 @@ class BottonController extends Controller
 
         if(isset($message['audio']))
         {
-            $fileName = $message['audio']['title'];
-            $fileType = $message['audio']['mime_type'];
-            $fileID = $message['audio']['file_id'];
-            $fileSize = $message['audio']['file_size'];
+            $response = Telegram::getFile(['file_id' => $message['audio']['file_id']]);
+            if(isset($response['file_path']))
+            {
+                if (!File::exists(storage_path('files'))) 
+                {
+                    File::makeDirectory(storage_path('files'), 0777, true, true);
+                }
+                $uri = "https://api.telegram.org/file/bot".$bot->token."/".$response['file_path'];
+                copy($uri,storage_path('files').'/'.basename($response['file_path']));
+            
+                $data = [
+                    'type' => 'audio',
+                    'fileID' => $message['audio']['file_id'],
+                    'fileSize' => $message['audio']['file_size'],
+                    'sort' => 'ASC',
+                    'data' => storage_path('files').'/'.basename($response['file_path']),
+                    'bot_id' => $bot->id,
+                    'botton_id' => $cacheGet
+                ];
+                $this->botton->createBottonData($data);
+            }
         }
 
         if(isset($message['video']))
         {
-            $fileName = $message['video']['file_id'];
-            $fileType = $message['video']['mime_type'];
-            $fileID = $message['video']['file_id'];
-            $fileSize = $message['video']['file_size'];
+            $response = Telegram::getFile(['file_id' => $message['video']['file_id']]);
+            if(isset($response['file_path']))
+            {
+                if (!File::exists(storage_path('files'))) 
+                {
+                    File::makeDirectory(storage_path('files'), 0777, true, true);
+                }
+                $uri = "https://api.telegram.org/file/bot".$bot->token."/".$response['file_path'];
+                copy($uri,storage_path('files').'/'.basename($response['file_path']));
+            
+                $data = [
+                    'type' => 'video',
+                    'fileID' => $message['video']['file_id'],
+                    'fileSize' => $message['video']['file_size'],
+                    'sort' => 'ASC',
+                    'data' => storage_path('files').'/'.basename($response['file_path']),
+                    'bot_id' => $bot->id,
+                    'botton_id' => $cacheGet
+                ];
+                $this->botton->createBottonData($data);
+            }
         }
 
         if(isset($message['photo']))
         {
             $photo = end($message['photo']);
-            $fileName = $photo['file_id'];
-            $fileType = 'image';
-            $fileID = $photo['file_id'];
-            $fileSize = $photo['file_size'];
+
+            $response = Telegram::getFile(['file_id' => $photo['file_id']]);
+            if(isset($response['file_path']))
+            {
+                if (!File::exists(storage_path('files'))) 
+                {
+                    File::makeDirectory(storage_path('files'), 0777, true, true);
+                }
+                $uri = "https://api.telegram.org/file/bot".$bot->token."/".$response['file_path'];
+                copy($uri,storage_path('files').'/'.basename($response['file_path']));
+            
+                $data = [
+                    'type' => 'image',
+                    'fileID' => $photo['file_id'],
+                    'fileSize' => $photo['file_size'],
+                    'sort' => 'ASC',
+                    'data' => storage_path('files').'/'.basename($response['file_path']),
+                    'bot_id' => $bot->id,
+                    'botton_id' => $cacheGet
+                ];
+                $this->botton->createBottonData($data);
+            }
         }
 
 
         if(isset($message['location']))
-        {
-            $fileType = 'location';
-            $fileName = json_encode($message['location']);
-
+        {  
+                $data = [
+                    'type' => 'location',
+                    'fileID' => 'location',
+                    'fileSize' => null,
+                    'sort' => 'ASC',
+                    'data' => json_encode($message['location']),
+                    'bot_id' => $bot->id,
+                    'botton_id' => $cacheGet
+                ];
+                $this->botton->createBottonData($data);
         }
+
 
         if(isset($message['text']))
         {
-            $text = $message['text'];
+            $data = [
+                'type' => 'text',
+                'fileID' => 'text',
+                'fileSize' => null,
+                'sort' => 'ASC',
+                'data' => $message['text'],
+                'bot_id' => $bot->id,
+                'botton_id' => $cacheGet
+            ];
+            $this->botton->createBottonData($data);
         }
 
-
-        
-            // Cache::forget($cacheKey);
 
         $keyboard = [  
             [trans('start.doneCreateArticle')],
@@ -641,5 +707,109 @@ class BottonController extends Controller
         ]);
     }
 
+
+
+
+    public function doneCreateArticle($bot,$message)
+    {
+        $keyboard = [  
+            [trans('start.ascArticleSort'),trans('start.descArticleSort')],
+            [trans('start.PreviusBtn')]
+        ];
+
+        $reply_markup = Telegram::replyKeyboardMarkup([
+            'keyboard' => $keyboard, 
+            'resize_keyboard' => true, 
+            'one_time_keyboard' => false
+        ]);
+        
+        $html = "
+        <i>پاسخ های این دکمه چگونه ارسال شوند?</i>
+        ";
+        
+        return Telegram::sendMessage([
+            'chat_id' => $message['chat']['id'],
+            'reply_to_message_id' => $message['message_id'], 
+            'text' => $html, 
+            'parse_mode' => 'HTML',
+            'reply_markup' => $reply_markup
+        ]);
+    }
+
+
+
+    public function ascArticleSort($bot,$message)
+    {
+        $cacheKey = $message['chat']['id'].'_bottonArticle';  
+        if(Cache::has($cacheKey))
+        {   
+            $cacheGet = Cache::get($cacheKey);
+        }
+
+        $this->botton->updateBottonData($bot->id,$cacheKey,'ASC');
+    
+        Cache::forget($cacheKey);
+
+        $keyboard = [  
+            [trans('start.PreviusBtn')]
+        ];
+
+        $reply_markup = Telegram::replyKeyboardMarkup([
+            'keyboard' => $keyboard, 
+            'resize_keyboard' => true, 
+            'one_time_keyboard' => false
+        ]);
+        
+        $html = "
+        <i>پاسخ ها با موفقیت اضافه شدند</i>
+        <i>برای ویرایش پاسخ ها از دکمه ویرایش پاسخ فعلی استفاده کنید</i>
+        ";
+        
+        return Telegram::sendMessage([
+            'chat_id' => $message['chat']['id'],
+            'reply_to_message_id' => $message['message_id'], 
+            'text' => $html, 
+            'parse_mode' => 'HTML',
+            'reply_markup' => $reply_markup
+        ]);
+    }
+
+
+
+    public function descArticleSort($bot,$message)
+    {
+        $cacheKey = $message['chat']['id'].'_bottonArticle';  
+        if(Cache::has($cacheKey))
+        {   
+            $cacheGet = Cache::get($cacheKey);
+        }
+
+        $this->botton->updateBottonData($bot->id,$cacheKey,'DESC');
+    
+        Cache::forget($cacheKey);
+
+        $keyboard = [  
+            [trans('start.PreviusBtn')]
+        ];
+
+        $reply_markup = Telegram::replyKeyboardMarkup([
+            'keyboard' => $keyboard, 
+            'resize_keyboard' => true, 
+            'one_time_keyboard' => false
+        ]);
+        
+        $html = "
+        <i>پاسخ ها با موفقیت اضافه شدند</i>
+        <i>برای ویرایش پاسخ ها از دکمه ویرایش پاسخ فعلی استفاده کنید</i>
+        ";
+        
+        return Telegram::sendMessage([
+            'chat_id' => $message['chat']['id'],
+            'reply_to_message_id' => $message['message_id'], 
+            'text' => $html, 
+            'parse_mode' => 'HTML',
+            'reply_markup' => $reply_markup
+        ]);
+    }
 
 }

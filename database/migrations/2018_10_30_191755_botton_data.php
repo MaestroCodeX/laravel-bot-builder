@@ -20,7 +20,7 @@ class BottonData extends Migration
             $table->string('type',100)->nullable();
             $table->string('fileID',200)->nullable();
             $table->string('fileSize',20)->nullable();
-            $table->string('sort',25)->defualt('asc');
+            $table->string('sort',25)->defualt('ASC');
             $table->text('data');
             $table->unsignedInteger('bot_id');
             $table->unsignedInteger('botton_id');

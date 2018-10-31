@@ -90,7 +90,13 @@ class UserController extends Controller
                     case trans('start.bottonAnswer'):
                         return app(BottonController::class)->bottonAnswerBotton($bot,$value['message'],$botton);   
                     case trans('start.showArticle'):
-                        return app(BottonController::class)->showArticle‌Botton($bot,$value['message'],$botton);      
+                        return app(BottonController::class)->showArticle‌Botton($bot,$value['message'],$botton);
+                    case trans('start.doneCreateArticle'):
+                        return app(BottonController::class)->doneCreateArticle($bot,$value['message']);  
+                    case trans('start.ascArticleSort'):
+                        return app(BottonController::class)->ascArticleSort($bot,$value['message']);   
+                    case trans('start.descArticleSort'):
+                        return app(BottonController::class)->descArticleSort($bot,$value['message']);   
                     case Cache::has($value['message']['chat']['id'].'_bottonArticle'):
                         return app(BottonController::class)->getArticle‌Botton($bot,$value['message']); 
                     case !is_null($botton):

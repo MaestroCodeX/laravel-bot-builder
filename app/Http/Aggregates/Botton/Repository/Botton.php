@@ -12,6 +12,11 @@ class BottonRepository implements BottonContract
     {
         return BottonData::create($data);
     }
+
+    public function updateBottonData($bot_id,$botton_id,$sort)
+    {
+        return BottonData::where('bot_id',$bot_id)->where('botton_id',$botton_id)->update(['sort'=>$sort]);
+    }
   
     public function createBotton($data)
     {
