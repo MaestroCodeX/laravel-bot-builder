@@ -20,7 +20,8 @@ class BottonRepository implements BottonContract
 
     public function bottonData($bot_id,$botton_id)
     {
-        return BottonData::where('bot_id',$bot_id)->where('botton_id',$botton_id)->get();
+        $BottonData = BottonData::where('bot_id',$bot_id)->where('botton_id',$botton_id)->first();
+        return BottonData::where('bot_id',$bot_id)->where('botton_id',$botton_id)->orderBy('created_at',$BottonData->sort)->get();
     }
   
     public function createBotton($data)
