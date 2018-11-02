@@ -29,6 +29,10 @@ class BotController extends Controller
 
     public function newBot($message)
     {
+        Telegram::sendChatAction([
+            'chat_id' => $message['chat']['id'], 
+            'action' => 'typing'
+        ]);
         $user = $this->user->get_user($message['chat']['id']);
         if($user !== null && $user->status == 'DEACTIVATE')
         {
@@ -72,6 +76,10 @@ class BotController extends Controller
 
     public function createBot($message)
     {
+        Telegram::sendChatAction([
+            'chat_id' => $message['chat']['id'], 
+            'action' => 'typing'
+        ]);
         $user = $this->user->get_user($message['chat']['id']);
 
         $keyboard = [
@@ -109,6 +117,10 @@ class BotController extends Controller
 
     public function checkAndCreateBot($botToken,$botInfo,$message)
     {
+        Telegram::sendChatAction([
+            'chat_id' => $message['chat']['id'], 
+            'action' => 'typing'
+        ]);
         $user = $this->user->get_user($message['chat']['id']);
         if($user == null)
         {   
@@ -186,6 +198,10 @@ class BotController extends Controller
 
     public function botNotFound($message)
     {
+        Telegram::sendChatAction([
+            'chat_id' => $message['chat']['id'], 
+            'action' => 'typing'
+        ]);
         $keyboard = [
             [trans('start.PreviusBtn')]
         ];
@@ -212,6 +228,10 @@ class BotController extends Controller
 
     public function botExist($message)
     {
+        Telegram::sendChatAction([
+            'chat_id' => $message['chat']['id'], 
+            'action' => 'typing'
+        ]);
         $keyboard = [
             [trans('start.PreviusBtn')]
         ];
@@ -275,6 +295,10 @@ class BotController extends Controller
   
     public function myBots($message)
     {
+        Telegram::sendChatAction([
+            'chat_id' => $message['chat']['id'], 
+            'action' => 'typing'
+        ]);
         $bots = $this->bot->userBots($message['chat']['id']);
         if($bots->toarray() == [])
         {
@@ -328,6 +352,10 @@ class BotController extends Controller
 
     public function BotAction($message)
     {
+        Telegram::sendChatAction([
+            'chat_id' => $message['chat']['id'], 
+            'action' => 'typing'
+        ]);
         $cacheKey = $message['chat']['id'].'_delete';    
         if(Cache::has($cacheKey))
         {   
@@ -363,6 +391,10 @@ class BotController extends Controller
 
     public function deleteBot($message)
     {
+        Telegram::sendChatAction([
+            'chat_id' => $message['chat']['id'], 
+            'action' => 'typing'
+        ]);
         $key = $message['chat']['id'].'_delete';
         if(Cache::has($key))
         {

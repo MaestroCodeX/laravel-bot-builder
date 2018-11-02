@@ -27,8 +27,14 @@ class AdminBotController extends Controller
 
     public function AdminBot($updates)
     {
+
                     $value = $updates;
 
+                    Telegram::sendChatAction([
+                        'chat_id' => $value['message']['chat']['id'], 
+                        'action' => 'typing'
+                    ]);
+                    
                     //register user with their contact
                     if(isset($value['message']['contact']))
                     {
@@ -89,7 +95,10 @@ class AdminBotController extends Controller
 
     public function start($message)
     {
-
+        Telegram::sendChatAction([
+            'chat_id' => $message['chat']['id'], 
+            'action' => 'typing'
+        ]);
         $keyboard = [
             [trans('start.Rules')],
             [trans('start.NewBot')],
@@ -134,6 +143,10 @@ class AdminBotController extends Controller
 
     public function notFound($message)
     {
+        Telegram::sendChatAction([
+            'chat_id' => $message['chat']['id'], 
+            'action' => 'typing'
+        ]);
         $keyboard = [
             [trans('start.Rules')],
             [trans('start.NewBot')],
@@ -166,6 +179,10 @@ class AdminBotController extends Controller
 
     public function register($message)
     {
+        Telegram::sendChatAction([
+            'chat_id' => $message['chat']['id'], 
+            'action' => 'typing'
+        ]);
         if(strpos($message['contact']['phone_number'],'98') !== 0 && strpos($message['contact']['phone_number'],'+98') !== 0)
         {
                 $keyboard = [
@@ -233,6 +250,10 @@ class AdminBotController extends Controller
 
     public function repeatSms($message)
     {
+        Telegram::sendChatAction([
+            'chat_id' => $message['chat']['id'], 
+            'action' => 'typing'
+        ]);
         $code = $this->get_by(5);
         $activation_code = Crypt::encrypt($code);
         $data = [
@@ -273,6 +294,10 @@ class AdminBotController extends Controller
 
     public function checkAndActiveUser($message)
     {
+        Telegram::sendChatAction([
+            'chat_id' => $message['chat']['id'], 
+            'action' => 'typing'
+        ]);
         $data = [
             'status' => 'ACTIVATE'
         ];
@@ -316,6 +341,10 @@ class AdminBotController extends Controller
 
     public function userNotFound($message)
     {
+        Telegram::sendChatAction([
+            'chat_id' => $message['chat']['id'], 
+            'action' => 'typing'
+        ]);
         $keyboard = [
             [trans('start.PreviusBtn')]
         ];

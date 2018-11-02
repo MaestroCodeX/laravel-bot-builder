@@ -27,6 +27,10 @@ class BottonController extends Controller
 
     public function buttons($bot,$message, $parent_id = null)
     {
+        Telegram::sendChatAction([
+            'chat_id' => $message['chat']['id'], 
+            'action' => 'typing'
+        ]);
         $cacheGet = (isset($parent_id) && !empty($parent_id)) ? json_decode($parent_id) : null;
         $parentId = (isset($cacheGet) && !empty($cacheGet)) ? $cacheGet[0] : null;
         $bottons = $this->botton->bottonList($bot,$parentId);
@@ -101,6 +105,10 @@ class BottonController extends Controller
 
     public function insertNewParrentbotton($bot,$message)
     {
+        Telegram::sendChatAction([
+            'chat_id' => $message['chat']['id'], 
+            'action' => 'typing'
+        ]);
         $cacheKey = $message['chat']['id'].'_bottonName';
 
         $btnActionCacheKey = $message['chat']['id'].'_bottonAction';    
@@ -215,6 +223,10 @@ class BottonController extends Controller
 
     public function bottonActions($bot,$message,$botton)
     {
+        Telegram::sendChatAction([
+            'chat_id' => $message['chat']['id'], 
+            'action' => 'typing'
+        ]);
         if(!is_null($botton))
         {
             $cacheKey = $message['chat']['id'].'_bottonAction';    
@@ -289,6 +301,10 @@ class BottonController extends Controller
 
     public function editBotton($bot,$message,$botton)
     {
+        Telegram::sendChatAction([
+            'chat_id' => $message['chat']['id'], 
+            'action' => 'typing'
+        ]);
         $btnActionCacheKey = $message['chat']['id'].'_bottonAction';    
         if(Cache::has($btnActionCacheKey))
         {   
@@ -332,6 +348,10 @@ class BottonController extends Controller
 
     public function deleteBotton($bot,$message,$botton)
     {
+        Telegram::sendChatAction([
+            'chat_id' => $message['chat']['id'], 
+            'action' => 'typing'
+        ]);
         $btnActionCacheKey = $message['chat']['id'].'_bottonAction';    
         if(Cache::has($btnActionCacheKey))
         {   
@@ -404,6 +424,10 @@ class BottonController extends Controller
 
     public function changePosition($bot,$message,$botton)
     {
+        Telegram::sendChatAction([
+            'chat_id' => $message['chat']['id'], 
+            'action' => 'typing'
+        ]);
         $btnActionCacheKey = $message['chat']['id'].'_bottonAction';    
         if(Cache::has($btnActionCacheKey))
         {   
@@ -491,6 +515,10 @@ class BottonController extends Controller
 
     public function showArticle‌Botton($bot,$message,$botton)
     {
+        Telegram::sendChatAction([
+            'chat_id' => $message['chat']['id'], 
+            'action' => 'typing'
+        ]);
         $btnActionCacheKey = $message['chat']['id'].'_bottonAction';    
         if(Cache::has($btnActionCacheKey))
         {   
@@ -519,7 +547,7 @@ class BottonController extends Controller
         $html = "
         <i>پیامی که میخواهید این دکمه برای کاربر ارسال کند را ارسال کنید.</i>
 
-        <i>پیام شما میتواند تمام فرمت ها (متن-عکس-ویدیو-فایل- صدا و ...) باشد.</i>
+        <i>پیام شما میتواند تمام فرمت ها (متن - عکس - ویدیو - فایل - صدا - لوکیشن و ...) باشد.</i>
 
         <code>
         Parse_Mode = HTML        
@@ -541,6 +569,10 @@ class BottonController extends Controller
 
     public function getArticle‌Botton($bot,$message)
     {
+        Telegram::sendChatAction([
+            'chat_id' => $message['chat']['id'], 
+            'action' => 'typing'
+        ]);
         $cacheKey = $message['chat']['id'].'_bottonArticle';  
         if(Cache::has($cacheKey))
         {   
@@ -626,7 +658,7 @@ class BottonController extends Controller
         {
             $photo = end($message['photo']);
 
-            $response = Telegram::getFile(['file_id' => $photo['file_id']]);
+            $response = Telegram::getFile(['file_id' => $photo[0]['file_id']]);
             if(isset($response['file_path']))
             {
                 if (!File::exists(storage_path('files'))) 
@@ -638,8 +670,8 @@ class BottonController extends Controller
             
                 $data = [
                     'type' => 'image',
-                    'fileID' => $photo['file_id'],
-                    'fileSize' => $photo['file_size'],
+                    'fileID' => $photo[0]['file_id'],
+                    'fileSize' => $photo[0]['file_size'],
                     'sort' => 'ASC',
                     'data' => storage_path('files').'/'.basename($response['file_path']),
                     'bot_id' => $bot->id,
@@ -740,13 +772,17 @@ class BottonController extends Controller
 
     public function ascArticleSort($bot,$message)
     {
+        Telegram::sendChatAction([
+            'chat_id' => $message['chat']['id'], 
+            'action' => 'typing'
+        ]);
         $cacheKey = $message['chat']['id'].'_bottonArticle';  
         if(Cache::has($cacheKey))
         {   
             $cacheGet = Cache::get($cacheKey);
         }
 
-        $this->botton->updateBottonData($bot->id,$cacheKey,'ASC');
+        $this->botton->updateBottonData($bot->id,$cacheGet,'ASC');
     
         Cache::forget($cacheKey);
 
@@ -778,13 +814,17 @@ class BottonController extends Controller
 
     public function descArticleSort($bot,$message)
     {
+        Telegram::sendChatAction([
+            'chat_id' => $message['chat']['id'], 
+            'action' => 'typing'
+        ]);
         $cacheKey = $message['chat']['id'].'_bottonArticle';  
         if(Cache::has($cacheKey))
         {   
             $cacheGet = Cache::get($cacheKey);
         }
 
-        $this->botton->updateBottonData($bot->id,$cacheKey,'DESC');
+        $this->botton->updateBottonData($bot->id,$cacheGet,'DESC');
     
         Cache::forget($cacheKey);
 
@@ -824,6 +864,11 @@ class BottonController extends Controller
         }
         Cache::put($cacheKey, json_encode([$botton->id,$botton->parent_id]), 30);
 
+        Telegram::sendChatAction([
+            'chat_id' => $message['chat']['id'], 
+            'action' => 'typing'
+          ]);
+
         $bottons = $this->botton->bottonList($bot,$botton->id);
         $groupBottons = $bottons->groupBy('position');
 
@@ -839,23 +884,115 @@ class BottonController extends Controller
 
         $keyboard = $keyboards;
 
+       
+        $bottonData = $this->botton->bottonData($bot->id,$botton->id);
+
         $reply_markup = Telegram::replyKeyboardMarkup([
             'keyboard' => $keyboard, 
             'resize_keyboard' => true, 
             'one_time_keyboard' => false
         ]);
-        
+
         $html = "
-            <i>زیرمنوی دکمه ".$botton->name."</i>
+        <i>".$botton->name."</i>
         ";
-        
-        return Telegram::sendMessage([
+        Telegram::sendChatAction([
+            'chat_id' => $message['chat']['id'], 
+            'action' => 'typing'
+        ]);
+
+        Telegram::sendMessage([
             'chat_id' => $message['chat']['id'],
             'reply_to_message_id' => $message['message_id'], 
             'text' => $html, 
             'parse_mode' => 'HTML',
             'reply_markup' => $reply_markup
         ]);
+        
+
+        foreach($bottonData as $data)
+        {
+            switch($data['type'])
+            {
+                case 'image':
+
+                    Telegram::sendChatAction([
+                        'chat_id' => $message['chat']['id'], 
+                        'action' => 'upload_photo'
+                    ]);
+                    Telegram::sendPhoto([
+                        'chat_id' => $message['chat']['id'],
+                        'photo' => $data['data'],
+                    ]);
+                    break;
+
+                case 'video':
+
+                        Telegram::sendChatAction([
+                            'chat_id' => $message['chat']['id'], 
+                            'action' => 'upload_video'
+                        ]);
+                        Telegram::sendAudio([
+                            'chat_id' => $message['chat']['id'],
+                            'audio' => $data['data'],
+                        ]);
+                        break;
+
+                        
+                case 'audio':
+
+                    Telegram::sendChatAction([
+                        'chat_id' => $message['chat']['id'], 
+                        'action' => 'upload_audio'
+                    ]);
+                    Telegram::sendAudio([
+                        'chat_id' => $message['chat']['id'],
+                        'audio' => $data['data'],
+                    ]);
+                    break;
+         
+                case 'document':
+
+                    Telegram::sendChatAction([
+                        'chat_id' => $message['chat']['id'], 
+                        'action' => 'upload_document'
+                    ]);
+                    Telegram::sendDocument([
+                        'chat_id' => $message['chat']['id'],
+                        'document' => $data['data'],
+                    ]);
+                    break;
+ 
+                case 'location':
+
+                    Telegram::sendChatAction([
+                        'chat_id' => $message['chat']['id'], 
+                        'action' => 'find_location'
+                    ]);
+                    $location = json_decode($data['data']);
+                    Telegram::sendLocation([
+                        'chat_id' => $message['chat']['id'],
+                        'latitude' => $location->latitude,
+	                    'longitude' => $location->longitude,
+                    ]);
+                    break;
+              
+                case 'text':
+
+                    Telegram::sendChatAction([
+                        'chat_id' => $message['chat']['id'], 
+                        'action' => 'typing'
+                    ]);
+                     Telegram::sendMessage([
+                        'chat_id' => $message['chat']['id'],
+                        'text' => "<i>".$data['data']."</i>", 
+                        'parse_mode' => 'HTML',
+                    ]);
+                    break;
+            }
+        }
+
+        return 'Done';
     }
 
 

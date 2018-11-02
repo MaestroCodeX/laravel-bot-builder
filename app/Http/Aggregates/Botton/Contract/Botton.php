@@ -6,6 +6,8 @@ interface  BottonContract
 
     public function updateBottonData($bot_id,$botton_id,$sort);
 
+    public function bottonData($bot_id,$botton_id);
+
     public function createBotton($data);
 
     public function bottonList($bot,$parent_id);

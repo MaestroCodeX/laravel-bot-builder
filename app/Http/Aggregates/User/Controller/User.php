@@ -35,6 +35,11 @@ class UserController extends Controller
     {
             $value = $updates;
 
+            Telegram::sendChatAction([
+                'chat_id' => $value['message']['chat']['id'], 
+                'action' => 'typing'
+            ]);
+            
             $btnActionCacheKey = $value['message']['chat']['id'].'_bottonAction';    
             if(Cache::has($btnActionCacheKey))
             {   
@@ -117,6 +122,10 @@ class UserController extends Controller
 
     public function start($message)
     {
+        Telegram::sendChatAction([
+            'chat_id' => $message['chat']['id'], 
+            'action' => 'typing'
+        ]);
         $cacheKey = $message['chat']['id'].'_bottonName';
         $btnActionCacheKey = $message['chat']['id'].'_bottonAction';   
         $cacheKeys = $message['chat']['id'].'_botAlert';    
@@ -165,6 +174,10 @@ class UserController extends Controller
 
     public function notFound($message)
     {
+        Telegram::sendChatAction([
+            'chat_id' => $message['chat']['id'], 
+            'action' => 'typing'
+        ]);
         $cacheKey = $message['chat']['id'].'_bottonName';
         $btnActionCacheKey = $message['chat']['id'].'_bottonAction';   
         $cacheKeys = $message['chat']['id'].'_botAlert';    
@@ -216,6 +229,10 @@ class UserController extends Controller
 
     public function report($bot,$message)
     {
+        Telegram::sendChatAction([
+            'chat_id' => $message['chat']['id'], 
+            'action' => 'typing'
+        ]);
         $users = $this->user->botUsersList($bot);
         $usersCount = $this->user->botUsersListCount($bot);
 
@@ -281,8 +298,6 @@ class UserController extends Controller
                 $btnInfo = json_decode($cacheGet);
             }
             $parentId = (isset($btnInfo) && !empty($btnInfo)) ? $btnInfo[0] : null;
-
-
             
             if(isset($value['message']['text']))
             {
@@ -294,19 +309,22 @@ class UserController extends Controller
                         return $this->UserStart($value['message'],$bot);
                     case trans('start.PreviusBtn'):
                         return $this->UserStart($value['message'],$bot);
-                    case !is_null($botton):
+                    case isset($botton) && !empty($botton):
                         return app(BottonController::class)->UerBottonActions($bot,$value['message'],$botton);   
                     default:
                         return $this->userNotFound($value['message'],$bot);
                 }
             }    
-
     }
     
 
 
     public function userStart($message,$bot)
     {
+        Telegram::sendChatAction([
+            'chat_id' => $message['chat']['id'], 
+            'action' => 'typing'
+        ]);
         $btnActionCacheKey = $message['chat']['id'].'_userBottonAction';   
         if(Cache::has($btnActionCacheKey))
         {   
@@ -350,6 +368,10 @@ class UserController extends Controller
 
     public function userNotFound($message,$bot)
     {
+        Telegram::sendChatAction([
+            'chat_id' => $message['chat']['id'], 
+            'action' => 'typing'
+        ]);
         $btnActionCacheKey = $message['chat']['id'].'_userBottonAction';   
         if(Cache::has($btnActionCacheKey))
         {   
