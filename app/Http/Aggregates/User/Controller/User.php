@@ -322,7 +322,6 @@ class UserController extends Controller
             $btn = array_column($gb,'name');
             $keyboards[] = $btn;
         }
-        array_push($keyboards,[trans('start.PreviusBtn')]);
 
         $keyboard = $keyboards;
 
@@ -366,7 +365,6 @@ class UserController extends Controller
             $btn = array_column($gb,'name');
             $keyboards[] = $btn;
         }
-        array_push($keyboards,[trans('start.PreviusBtn')]);
 
         $keyboard = $keyboards;
         
