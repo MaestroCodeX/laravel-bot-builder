@@ -39,8 +39,6 @@ class StartController extends Controller
             return app(AdminBotController::class)->AdminBot($updates);
     }
   
-           // $chat_id = $update->getMessage()->getChat()->getId();
-        // $text = $update->getMessage()->getText();
-        // $name = $update->getMessage()->getChat()->getFirstName();
+
 
 }

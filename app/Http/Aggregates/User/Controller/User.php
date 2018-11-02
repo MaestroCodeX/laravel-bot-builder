@@ -265,6 +265,133 @@ class UserController extends Controller
 
   
 
+
+
+    //// user client bot///////
+    /////////////////////////////
+
+    public function UserBot($bot,$updates)
+    {
+            $value = $updates;
+
+            $btnActionCacheKey = $value['message']['chat']['id'].'_userBottonAction';    
+            if(Cache::has($btnActionCacheKey))
+            {   
+                $cacheGet = Cache::get($btnActionCacheKey);
+                $btnInfo = json_decode($cacheGet);
+            }
+            $parentId = (isset($btnInfo) && !empty($btnInfo)) ? $btnInfo[0] : null;
+
+
+            
+            if(isset($value['message']['text']))
+            {
+                $botton = $this->botton->existParentBtn($value['message']['text'],$bot->id,$value['message']['chat']['id'],$parentId);
+
+                switch($value['message']['text'])
+                {
+                    case trans('start.StartBot'):
+                        return $this->UserStart($value['message'],$bot);
+                    case trans('start.PreviusBtn'):
+                        return $this->UserStart($value['message'],$bot);
+                    case !is_null($botton):
+                        return app(BottonController::class)->UerBottonActions($bot,$value['message'],$botton);   
+                    default:
+                        return $this->userNotFound($value['message'],$bot);
+                }
+            }    
+
+    }
     
+
+
+    public function userStart($message,$bot)
+    {
+        $btnActionCacheKey = $message['chat']['id'].'_userBottonAction';   
+        if(Cache::has($btnActionCacheKey))
+        {   
+            Cache::forget($btnActionCacheKey);
+        }
+        $bottons = $this->botton->bottonList($bot,NULL);
+        $groupBottons = $bottons->groupBy('position');
+        $encodeBtn = json_encode($groupBottons);
+        $decodeBtn = json_decode($encodeBtn,true);
+        $keyboards = []; 
+        foreach($decodeBtn as $key => $gb)
+        {
+            $btn = array_column($gb,'name');
+            $keyboards[] = $btn;
+        }
+        array_push($keyboards,[trans('start.PreviusBtn')]);
+
+        $keyboard = $keyboards;
+
+        
+        $reply_markup = Telegram::replyKeyboardMarkup([
+            'keyboard' => $keyboard, 
+            'resize_keyboard' => true, 
+            'one_time_keyboard' => false
+        ]);
+
+        $html = "
+            <i>سلام</i>,
+            <i>خوش آمدید</i>
+        ";
+
+         return Telegram::sendMessage([
+            'chat_id' => $message['chat']['id'],
+            'reply_to_message_id' => $message['message_id'], 
+            'text' => $html, 
+            'parse_mode' => 'HTML',
+            'reply_markup' => $reply_markup
+        ]);
+        
+    }
+ 
+
+    public function userNotFound($message,$bot)
+    {
+        $btnActionCacheKey = $message['chat']['id'].'_userBottonAction';   
+        if(Cache::has($btnActionCacheKey))
+        {   
+            Cache::forget($btnActionCacheKey);
+        }
+        $bottons = $this->botton->bottonList($bot,NULL);
+        $groupBottons = $bottons->groupBy('position');
+        $encodeBtn = json_encode($groupBottons);
+        $decodeBtn = json_decode($encodeBtn,true);
+        $keyboards = []; 
+        foreach($decodeBtn as $key => $gb)
+        {
+            $btn = array_column($gb,'name');
+            $keyboards[] = $btn;
+        }
+        array_push($keyboards,[trans('start.PreviusBtn')]);
+
+        $keyboard = $keyboards;
+        
+        $reply_markup = Telegram::replyKeyboardMarkup([
+            'keyboard' => $keyboard, 
+            'resize_keyboard' => true, 
+            'one_time_keyboard' => false
+        ]);
+
+        $html="
+            <b>خطا</b>
+            <code>دستور ارسالی وجود ندارد</code>
+        ";
+
+        return Telegram::sendMessage([
+            'chat_id' => $message['chat']['id'],
+            'reply_to_message_id' => $message['message_id'], 
+            'text' => $html, 
+            'parse_mode' => 'HTML',
+            'reply_markup' => $reply_markup
+        ]);
+        
+    }
+
+
+
 
 }

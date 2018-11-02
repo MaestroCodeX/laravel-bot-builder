@@ -34,7 +34,7 @@ class BottonController extends Controller
 
         $encodeBtn = json_encode($groupBottons);
         $decodeBtn = json_decode($encodeBtn,true);
-        $keyboards = [];
+        $keyboards = []; 
         foreach($decodeBtn as $key => $gb)
         {
             $btn = array_column($gb,'name');
@@ -811,5 +811,53 @@ class BottonController extends Controller
             'reply_markup' => $reply_markup
         ]);
     }
+
+
+
+
+    public function UerBottonActions($bot, $message, $botton)
+    {
+        $cacheKey = $message['chat']['id'].'_userBottonAction';    
+        if(Cache::has($cacheKey))
+        {   
+            Cache::forget($cacheKey);
+        }
+        Cache::put($cacheKey, json_encode([$botton->id,$botton->parent_id]), 30);
+
+        $bottons = $this->botton->bottonList($bot,$botton->id);
+        $groupBottons = $bottons->groupBy('position');
+
+        $encodeBtn = json_encode($groupBottons);
+        $decodeBtn = json_decode($encodeBtn,true);
+        $keyboards = []; 
+        foreach($decodeBtn as $key => $gb)
+        {
+            $btn = array_column($gb,'name');
+            $keyboards[] = $btn;
+        }
+        array_push($keyboards,[trans('start.PreviusBtn')]);
+
+        $keyboard = $keyboards;
+
+        $reply_markup = Telegram::replyKeyboardMarkup([
+            'keyboard' => $keyboard, 
+            'resize_keyboard' => true, 
+            'one_time_keyboard' => false
+        ]);
+        
+        $html = "
+            <i>زیرمنوی دکمه ".$botton->name."</i>
+        ";
+        
+        return Telegram::sendMessage([
+            'chat_id' => $message['chat']['id'],
+            'reply_to_message_id' => $message['message_id'], 
+            'text' => $html, 
+            'parse_mode' => 'HTML',
+            'reply_markup' => $reply_markup
+        ]);
+    }
+
+
 
 }

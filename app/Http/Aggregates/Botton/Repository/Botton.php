@@ -37,19 +37,9 @@ class BottonRepository implements BottonContract
     {
         if(is_null($parent_id))
         {
-            return Botton::where('bot_id',$bot_id)->whereNull('parent_id')->where('name','=',$text)->whereHas('bot', function ($query) use($user_id) {
-                $query->whereHas('user', function($q) use($user_id)
-                {
-                        $q->where('telegram_user_id',$user_id);
-                });
-            })->with('bot')->first();
+            return Botton::where('bot_id',$bot_id)->whereNull('parent_id')->where('name','=',$text)->with('bot')->first();
         }
-        return Botton::where('bot_id',$bot_id)->where('parent_id',$parent_id)->where('name','=',$text)->whereHas('bot', function ($query) use($user_id) {
-            $query->whereHas('user', function($q) use($user_id)
-            {
-                    $q->where('telegram_user_id',$user_id);
-            });
-        })->with('bot')->first();
+        return Botton::where('bot_id',$bot_id)->where('parent_id',$parent_id)->where('name','=',$text)->with('bot')->first();
     }
 
 
@@ -70,5 +60,6 @@ class BottonRepository implements BottonContract
     {
         return Botton::where('id',$botton_id)->update(['position'=>$position]);
     }
+
 
 }
