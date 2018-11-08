@@ -83,7 +83,8 @@ class BotController extends Controller
         $user = $this->user->get_user($message['chat']['id']);
 
         $keyboard = [
-            [trans('start.CreateBotVideo')]
+            [trans('start.PreviusBtn')]
+            // [trans('start.CreateBotVideo')]
         ];
 
         $reply_markup = Telegram::replyKeyboardMarkup([

@@ -83,9 +83,15 @@ class BottonController extends Controller
         }
         Cache::put($cacheKey, $message['text'], 30);
 
+        $keyboard = [  
+            [trans('start.PreviusBtn')]
+        ];
+
         $reply_markup = Telegram::replyKeyboardMarkup([
-            'remove_keyboard' => true, 
-        ]);
+            'keyboard' => $keyboard, 
+            'resize_keyboard' => true, 
+            'one_time_keyboard' => false
+        ]);  
         
         $html = "
             <i>نام دکمه مورد نظر را ارسال کنید</i>,
@@ -656,9 +662,10 @@ class BottonController extends Controller
 
         if(isset($message['photo']))
         {
-            $photo = end($message['photo']);
 
-            $response = Telegram::getFile(['file_id' => $photo[0]['file_id']]);
+            $photo = last(last($message['photo']));
+            
+            $response = Telegram::getFile(['file_id' => $photo['file_id']]);
             if(isset($response['file_path']))
             {
                 if (!File::exists(storage_path('files'))) 
@@ -670,8 +677,8 @@ class BottonController extends Controller
             
                 $data = [
                     'type' => 'image',
-                    'fileID' => $photo[0]['file_id'],
-                    'fileSize' => $photo[0]['file_size'],
+                    'fileID' => $photo['file_id'],
+                    'fileSize' => $photo['file_size'],
                     'sort' => 'ASC',
                     'data' => storage_path('files').'/'.basename($response['file_path']),
                     'bot_id' => $bot->id,

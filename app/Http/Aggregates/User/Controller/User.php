@@ -71,9 +71,11 @@ class UserController extends Controller
                     case trans('start.report'):
                         return $this->report($bot,$value['message']);  
                     case trans('start.tools'):
-                        return $this->tools($value['message']);       
+                        return $this->commingSoon($value['message']);
+                        // return $this->tools($value['message']);       
                     case trans('start.publicMessage'):
-                        return $this->publicMessage($value['message']);
+                        return $this->commingSoon($value['message']);
+                        // return $this->publicMessage($value['message']);
                     case trans('start.buttons'):
                         return app(BottonController::class)->buttons($bot,$value['message'],null);    
                     case strpos($value['message']['text'],trans('start.newBouttonKey')) === 0:
@@ -104,6 +106,8 @@ class UserController extends Controller
                         return app(BottonController::class)->descArticleSort($bot,$value['message']);   
                     case Cache::has($value['message']['chat']['id'].'_bottonArticle'):
                         return app(BottonController::class)->getArticle‌Botton($bot,$value['message']); 
+                    case trans('start.createFaq'):
+                        return $this->commingSoon($value['message']);
                     case !is_null($botton):
                         return app(BottonController::class)->bottonActions($bot,$value['message'],$botton);        
                     default:
@@ -212,6 +216,58 @@ class UserController extends Controller
         $html="
             <b>خطا</b>
             <code>دستور ارسالی وجود ندارد</code>
+        ";
+
+        return Telegram::sendMessage([
+            'chat_id' => $message['chat']['id'],
+            'reply_to_message_id' => $message['message_id'], 
+            'text' => $html, 
+            'parse_mode' => 'HTML',
+            'reply_markup' => $reply_markup
+        ]);
+        
+    }
+
+
+    public function commingSoon($message)
+    {
+        Telegram::sendChatAction([
+            'chat_id' => $message['chat']['id'], 
+            'action' => 'typing'
+        ]);
+        $cacheKey = $message['chat']['id'].'_bottonName';
+        $btnActionCacheKey = $message['chat']['id'].'_bottonAction';   
+        $cacheKeys = $message['chat']['id'].'_botAlert';    
+        $bottonArticle = $message['chat']['id'].'_bottonArticle';    
+        if(Cache::has($cacheKey))
+        {   
+            Cache::forget($cacheKey);
+        }
+        if(Cache::has($btnActionCacheKey))
+        {   
+            Cache::forget($btnActionCacheKey);
+        }
+        if(Cache::has($cacheKeys))
+        {   
+            Cache::forget($cacheKeys);
+        }
+        if(Cache::has($bottonArticle))
+        {   
+            Cache::forget($bottonArticle);
+        }
+        $keyboard = [
+            [trans('start.buttons'),trans('start.tools')],
+            [trans('start.report'),trans('start.publicMessage')]
+        ];
+        
+        $reply_markup = Telegram::replyKeyboardMarkup([
+            'keyboard' => $keyboard, 
+            'resize_keyboard' => true, 
+            'one_time_keyboard' => false
+        ]);
+
+        $html="
+            <code>این امکان به زودی در نسخه جدید اضافه خواهد شد</code>
         ";
 
         return Telegram::sendMessage([
