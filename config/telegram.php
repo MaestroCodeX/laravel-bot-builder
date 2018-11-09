@@ -14,7 +14,7 @@ return [
     |
     */
     'bot_token' => env('TELEGRAM_BOT_TOKEN', 'YOUR-BOT-TOKEN'),
-
+    'bot_id' => env('TELEGRAM_BOT_ID'),
     /*
     |--------------------------------------------------------------------------
     | Asynchronous Requests [Optional]
