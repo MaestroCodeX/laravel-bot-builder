@@ -12,11 +12,11 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        // $telegram = new Api(config('telegram.bot_token'));
+        $telegram = new Api(config('telegram.bot_token'));
 
-        // $telegram->removeWebhook();
-        // sleep(5);
-        // $telegram->setWebhook(['url' => config('telegram.webhook_url').config('telegram.bot_id').'/webhook']);
+        $telegram->removeWebhook();
+        sleep(5);
+        $telegram->setWebhook(['url' => config('telegram.webhook_url').config('telegram.bot_id').'/webhook']);
     }
 
     /**
