@@ -363,7 +363,7 @@ class BotController extends Controller
             Cache::forget($cacheKey);
         }
         $cacheText = str_replace('@','',$message['text']);
-        Cache::put($cacheKey, $cacheText, 10080);
+        Cache::put($cacheKey, $cacheText, 40320);
 
         $keyboard = [
             [trans('start.deleteBot')],
