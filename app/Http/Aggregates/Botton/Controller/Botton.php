@@ -81,7 +81,7 @@ class BottonController extends Controller
         {   
             Cache::forget($cacheKey);
         }
-        Cache::put($cacheKey, $message['text'], 30);
+        Cache::put($cacheKey, $message['text'], 10080);
 
         $keyboard = [  
             [trans('start.PreviusBtn')]
@@ -240,7 +240,7 @@ class BottonController extends Controller
             {   
                 Cache::forget($cacheKey);
             }
-            Cache::put($cacheKey, json_encode([$botton->id,$botton->parent_id]), 30);
+            Cache::put($cacheKey, json_encode([$botton->id,$botton->parent_id]), 10080);
         }
 
         $keyboard = [  
@@ -279,7 +279,7 @@ class BottonController extends Controller
         {   
             Cache::forget($cacheKey);
         }
-        Cache::put($cacheKey, 'editted', 30);
+        Cache::put($cacheKey, 'editted', 10080);
 
         $keyboard = [  
             [trans('start.PreviusBtn')]
@@ -401,7 +401,7 @@ class BottonController extends Controller
         {   
             Cache::forget($cacheKey);
         }
-        Cache::put($cacheKey, 'poistionChanged', 30);
+        Cache::put($cacheKey, 'poistionChanged', 10080);
 
         $keyboard = [  
             [trans('start.PreviusBtn')]
@@ -538,7 +538,7 @@ class BottonController extends Controller
         {   
             Cache::forget($cacheKey);
         }
-        Cache::put($cacheKey, $bottonId, 30);
+        Cache::put($cacheKey, $bottonId, 10080);
 
         $keyboard = [  
             [trans('start.PreviusBtn')]
@@ -869,7 +869,7 @@ class BottonController extends Controller
         {   
             Cache::forget($cacheKey);
         }
-        Cache::put($cacheKey, json_encode([$botton->id,$botton->parent_id]), 30);
+        Cache::put($cacheKey, json_encode([$botton->id,$botton->parent_id]), 10080);
 
         Telegram::sendChatAction([
             'chat_id' => $message['chat']['id'], 
