@@ -4,6 +4,7 @@ use Telegram;
 use Telegram\Bot\Api;
 use GuzzleHttp\Client;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Crypt;
 use App\Http\Aggregates\Bot\Controller\BotController;
 use App\Http\Aggregates\User\Controller\UserController;
@@ -95,6 +96,11 @@ class AdminBotController extends Controller
 
     public function start($message)
     {
+        $cacheKey = $message['chat']['id'].'_delete';    
+        if(Cache::has($cacheKey))
+        {   
+            Cache::forget($cacheKey);
+        }
         Telegram::sendChatAction([
             'chat_id' => $message['chat']['id'], 
             'action' => 'typing'
