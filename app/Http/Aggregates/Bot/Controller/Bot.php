@@ -129,7 +129,6 @@ class BotController extends Controller
             config(['telegram.bot_token' => env('TELEGRAM_BOT_TOKEN')]);
             return 'DONE';
         }
-
         $bot = $this->bot->getBot($botInfo->getId());
         if($bot !== null)
         {   
@@ -145,10 +144,11 @@ class BotController extends Controller
             'username' => $botInfo->getUsername(),
             'user_id' => $user->id
         ];
+
         $this->bot->createBot($data);
 
-        $newBottelegram = new Api($message['text']);
-
+        $newBottelegram = new Api($botToken);
+        sleep(1);
         $newBottelegram->setWebhook(['url' => config('telegram.webhook_url').$botInfo->getId().'/webhook']);
 
         $keyboard = [
