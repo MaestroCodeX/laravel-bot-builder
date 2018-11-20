@@ -23,12 +23,12 @@ class BottonController extends Controller
     }
 
 
-    
+
 
     public function buttons($bot,$message, $parent_id = null)
     {
         Telegram::sendChatAction([
-            'chat_id' => $message['chat']['id'], 
+            'chat_id' => $message['chat']['id'],
             'action' => 'typing'
         ]);
         $cacheGet = (isset($parent_id) && !empty($parent_id)) ? json_decode($parent_id) : null;
@@ -38,7 +38,7 @@ class BottonController extends Controller
 
         $encodeBtn = json_encode($groupBottons);
         $decodeBtn = json_decode($encodeBtn,true);
-        $keyboards = []; 
+        $keyboards = [];
         foreach($decodeBtn as $key => $gb)
         {
             $btn = array_column($gb,'name');
@@ -52,19 +52,19 @@ class BottonController extends Controller
         $keyboard = $keyboards;
 
         $reply_markup = Telegram::replyKeyboardMarkup([
-            'keyboard' => $keyboard, 
-            'resize_keyboard' => true, 
+            'keyboard' => $keyboard,
+            'resize_keyboard' => true,
             'one_time_keyboard' => false
         ]);
-        
+
         $html = "
             <i>بخش مدیریت دکمه ها</i>
         ";
-        
+
         return Telegram::sendMessage([
             'chat_id' => $message['chat']['id'],
-            'reply_to_message_id' => $message['message_id'], 
-            'text' => $html, 
+            'reply_to_message_id' => $message['message_id'],
+            'text' => $html,
             'parse_mode' => 'HTML',
             'reply_markup' => $reply_markup
         ]);
@@ -76,31 +76,31 @@ class BottonController extends Controller
 
     public function newBottonName($bot,$message)
     {
-        $cacheKey = $message['chat']['id'].'_bottonName';    
+        $cacheKey = $message['chat']['id'].$bot->id.'_bottonName';
         if(Cache::has($cacheKey))
-        {   
+        {
             Cache::forget($cacheKey);
         }
         Cache::put($cacheKey, $message['text'], 40320);
 
-        $keyboard = [  
+        $keyboard = [
             [trans('start.PreviusBtn')]
         ];
 
         $reply_markup = Telegram::replyKeyboardMarkup([
-            'keyboard' => $keyboard, 
-            'resize_keyboard' => true, 
+            'keyboard' => $keyboard,
+            'resize_keyboard' => true,
             'one_time_keyboard' => false
-        ]);  
-        
+        ]);
+
         $html = "
             <i>نام دکمه مورد نظر را ارسال کنید</i>,
         ";
-        
+
         return Telegram::sendMessage([
             'chat_id' => $message['chat']['id'],
-            'reply_to_message_id' => $message['message_id'], 
-            'text' => $html, 
+            'reply_to_message_id' => $message['message_id'],
+            'text' => $html,
             'parse_mode' => 'HTML',
             'reply_markup' => $reply_markup
         ]);
@@ -112,14 +112,14 @@ class BottonController extends Controller
     public function insertNewParrentbotton($bot,$message)
     {
         Telegram::sendChatAction([
-            'chat_id' => $message['chat']['id'], 
+            'chat_id' => $message['chat']['id'],
             'action' => 'typing'
         ]);
-        $cacheKey = $message['chat']['id'].'_bottonName';
+        $cacheKey = $message['chat']['id'].$bot->id.'_bottonName';
 
-        $btnActionCacheKey = $message['chat']['id'].'_bottonAction';    
+        $btnActionCacheKey = $message['chat']['id'].$bot->id.'_bottonAction';
         if(Cache::has($btnActionCacheKey))
-        {   
+        {
             $cacheGet = Cache::get($btnActionCacheKey);
             $parent_id = json_decode($cacheGet);
         }
@@ -129,32 +129,32 @@ class BottonController extends Controller
         if(!is_null($botton))
         {
             if(Cache::has($cacheKey))
-            {   
+            {
                 Cache::forget($cacheKey);
             }
             if(Cache::has($btnActionCacheKey))
-            {   
+            {
                 Cache::forget($btnActionCacheKey);
             }
-            $keyboard = [  
+            $keyboard = [
                 [trans('start.PreviusBtn')]
             ];
-    
+
             $reply_markup = Telegram::replyKeyboardMarkup([
-                'keyboard' => $keyboard, 
-                'resize_keyboard' => true, 
+                'keyboard' => $keyboard,
+                'resize_keyboard' => true,
                 'one_time_keyboard' => false
             ]);
-            
+
             $html = "
                 <b>خطا</b>
                 <i>این دکمه تکراری است و دکمه ای با همین عنوان در منو وجود دارد</i>,
             ";
-            
+
             return Telegram::sendMessage([
                 'chat_id' => $message['chat']['id'],
-                'reply_to_message_id' => $message['message_id'], 
-                'text' => $html, 
+                'reply_to_message_id' => $message['message_id'],
+                'text' => $html,
                 'parse_mode' => 'HTML',
                 'reply_markup' => $reply_markup
             ]);
@@ -173,55 +173,55 @@ class BottonController extends Controller
             $this->botton->createBotton($data);
             Cache::forget($cacheKey);
             if(Cache::has($btnActionCacheKey))
-            {   
+            {
                 Cache::forget($btnActionCacheKey);
             }
-            $keyboard = [  
+            $keyboard = [
                 [trans('start.buttons')]
             ];
-    
+
             $reply_markup = Telegram::replyKeyboardMarkup([
-                'keyboard' => $keyboard, 
-                'resize_keyboard' => true, 
+                'keyboard' => $keyboard,
+                'resize_keyboard' => true,
                 'one_time_keyboard' => false
             ]);
-            
+
             $html = "
                 <i>با موفقیت اضافه شد</i>,
             ";
-            
+
             return Telegram::sendMessage([
                 'chat_id' => $message['chat']['id'],
-                'reply_to_message_id' => $message['message_id'], 
-                'text' => $html, 
+                'reply_to_message_id' => $message['message_id'],
+                'text' => $html,
                 'parse_mode' => 'HTML',
                 'reply_markup' => $reply_markup
             ]);
         }
 
-        $keyboard = [  
+        $keyboard = [
             [trans('start.PreviusBtn')]
         ];
 
         $reply_markup = Telegram::replyKeyboardMarkup([
-            'keyboard' => $keyboard, 
-            'resize_keyboard' => true, 
+            'keyboard' => $keyboard,
+            'resize_keyboard' => true,
             'one_time_keyboard' => false
         ]);
-        
+
         $html = "
             <i>اشکالی پیش آمده مجددا تلاش کنید برگشت را بزنید</i>,
         ";
-        
+
         return Telegram::sendMessage([
             'chat_id' => $message['chat']['id'],
-            'reply_to_message_id' => $message['message_id'], 
-            'text' => $html, 
+            'reply_to_message_id' => $message['message_id'],
+            'text' => $html,
             'parse_mode' => 'HTML',
             'reply_markup' => $reply_markup
         ]);
     }
-   
+
 
 
 
@@ -230,20 +230,20 @@ class BottonController extends Controller
     public function bottonActions($bot,$message,$botton)
     {
         Telegram::sendChatAction([
-            'chat_id' => $message['chat']['id'], 
+            'chat_id' => $message['chat']['id'],
             'action' => 'typing'
         ]);
         if(!is_null($botton))
         {
-            $cacheKey = $message['chat']['id'].'_bottonAction';    
+            $cacheKey = $message['chat']['id'].$bot->id.'_bottonAction';
             if(Cache::has($cacheKey))
-            {   
+            {
                 Cache::forget($cacheKey);
             }
             Cache::put($cacheKey, json_encode([$botton->id,$botton->parent_id]), 40320);
         }
 
-        $keyboard = [  
+        $keyboard = [
             [trans('start.editBottonName'),trans('start.bottonAnswer')],
             [trans('start.bottonChangePosition'),trans('start.deleteBotton')],
             // [trans('start.bottonChangePosition'),trans('start.bottonLink'),trans('start.deleteBotton')],
@@ -252,19 +252,19 @@ class BottonController extends Controller
         ];
 
         $reply_markup = Telegram::replyKeyboardMarkup([
-            'keyboard' => $keyboard, 
-            'resize_keyboard' => true, 
+            'keyboard' => $keyboard,
+            'resize_keyboard' => true,
             'one_time_keyboard' => false
         ]);
-        
+
         $html = "
         <i>بخش مدیریت دکمه '".$message['text']."'</i>
         ";
-        
+
         return Telegram::sendMessage([
             'chat_id' => $message['chat']['id'],
-            'reply_to_message_id' => $message['message_id'], 
-            'text' => $html, 
+            'reply_to_message_id' => $message['message_id'],
+            'text' => $html,
             'parse_mode' => 'HTML',
             'reply_markup' => $reply_markup
         ]);
@@ -274,31 +274,31 @@ class BottonController extends Controller
 
     public function getEditBotton($bot,$message,$botton)
     {
-        $cacheKey = $message['chat']['id'].'_botAlert';    
+        $cacheKey = $message['chat']['id'].$bot->id.'_botAlert';
         if(Cache::has($cacheKey))
-        {   
+        {
             Cache::forget($cacheKey);
         }
         Cache::put($cacheKey, 'editted', 40320);
 
-        $keyboard = [  
+        $keyboard = [
             [trans('start.PreviusBtn')]
         ];
 
         $reply_markup = Telegram::replyKeyboardMarkup([
-            'keyboard' => $keyboard, 
-            'resize_keyboard' => true, 
+            'keyboard' => $keyboard,
+            'resize_keyboard' => true,
             'one_time_keyboard' => false
         ]);
-        
+
         $html = "
         <i>نام جدید را وارد نمایید</i>
         ";
-        
+
         return Telegram::sendMessage([
             'chat_id' => $message['chat']['id'],
-            'reply_to_message_id' => $message['message_id'], 
-            'text' => $html, 
+            'reply_to_message_id' => $message['message_id'],
+            'text' => $html,
             'parse_mode' => 'HTML',
             'reply_markup' => $reply_markup
         ]);
@@ -308,12 +308,12 @@ class BottonController extends Controller
     public function editBotton($bot,$message,$botton)
     {
         Telegram::sendChatAction([
-            'chat_id' => $message['chat']['id'], 
+            'chat_id' => $message['chat']['id'],
             'action' => 'typing'
         ]);
-        $btnActionCacheKey = $message['chat']['id'].'_bottonAction';    
+        $btnActionCacheKey = $message['chat']['id'].$bot->id.'_bottonAction';
         if(Cache::has($btnActionCacheKey))
-        {   
+        {
             $cacheGet = Cache::get($btnActionCacheKey);
             $parent_id = json_decode($cacheGet);
         }
@@ -321,29 +321,29 @@ class BottonController extends Controller
 
         $this->botton->updateBtn($bottonId,$message['text']);
 
-        $cacheKeys = $message['chat']['id'].'_botAlert';    
+        $cacheKeys = $message['chat']['id'].$bot->id.'_botAlert';
         if(Cache::has($cacheKeys))
-        {   
+        {
             Cache::forget($cacheKeys);
         }
-        $keyboard = [  
+        $keyboard = [
             [trans('start.PreviusBtn')]
         ];
 
         $reply_markup = Telegram::replyKeyboardMarkup([
-            'keyboard' => $keyboard, 
-            'resize_keyboard' => true, 
+            'keyboard' => $keyboard,
+            'resize_keyboard' => true,
             'one_time_keyboard' => false
         ]);
-        
+
         $html = "
         <i>نام دکمه با موفقیت تغییر کرد</i>
         ";
-        
+
         return Telegram::sendMessage([
             'chat_id' => $message['chat']['id'],
-            'reply_to_message_id' => $message['message_id'], 
-            'text' => $html, 
+            'reply_to_message_id' => $message['message_id'],
+            'text' => $html,
             'parse_mode' => 'HTML',
             'reply_markup' => $reply_markup
         ]);
@@ -355,12 +355,12 @@ class BottonController extends Controller
     public function deleteBotton($bot,$message,$botton)
     {
         Telegram::sendChatAction([
-            'chat_id' => $message['chat']['id'], 
+            'chat_id' => $message['chat']['id'],
             'action' => 'typing'
         ]);
-        $btnActionCacheKey = $message['chat']['id'].'_bottonAction';    
+        $btnActionCacheKey = $message['chat']['id'].$bot->id.'_bottonAction';
         if(Cache::has($btnActionCacheKey))
-        {   
+        {
             $cacheGet = Cache::get($btnActionCacheKey);
             $parent_id = json_decode($cacheGet);
         }
@@ -368,24 +368,24 @@ class BottonController extends Controller
 
         $this->botton->deleteBtn($bottonId);
 
-        $keyboard = [  
+        $keyboard = [
             [trans('start.PreviusBtn')]
         ];
 
         $reply_markup = Telegram::replyKeyboardMarkup([
-            'keyboard' => $keyboard, 
-            'resize_keyboard' => true, 
+            'keyboard' => $keyboard,
+            'resize_keyboard' => true,
             'one_time_keyboard' => false
         ]);
-        
+
         $html = "
         <i>دکمه مورد نظر با موفقیت حذف شد</i>
         ";
-        
+
         return Telegram::sendMessage([
             'chat_id' => $message['chat']['id'],
-            'reply_to_message_id' => $message['message_id'], 
-            'text' => $html, 
+            'reply_to_message_id' => $message['message_id'],
+            'text' => $html,
             'parse_mode' => 'HTML',
             'reply_markup' => $reply_markup
         ]);
@@ -396,47 +396,47 @@ class BottonController extends Controller
 
     public function getChangePosition($bot,$message,$botton)
     {
-        $cacheKey = $message['chat']['id'].'_botAlert';    
+        $cacheKey = $message['chat']['id'].$bot->id.'_botAlert';
         if(Cache::has($cacheKey))
-        {   
+        {
             Cache::forget($cacheKey);
         }
         Cache::put($cacheKey, 'poistionChanged', 40320);
 
-        $keyboard = [  
+        $keyboard = [
             [trans('start.PreviusBtn')]
         ];
 
         $reply_markup = Telegram::replyKeyboardMarkup([
-            'keyboard' => $keyboard, 
-            'resize_keyboard' => true, 
+            'keyboard' => $keyboard,
+            'resize_keyboard' => true,
             'one_time_keyboard' => false
         ]);
-        
+
         $html = "
         <i>موقعیت جدید دکمه را به صورت عدد انگلیسی وارد نمایید</i>
         ";
-        
+
         return Telegram::sendMessage([
             'chat_id' => $message['chat']['id'],
-            'reply_to_message_id' => $message['message_id'], 
-            'text' => $html, 
+            'reply_to_message_id' => $message['message_id'],
+            'text' => $html,
             'parse_mode' => 'HTML',
             'reply_markup' => $reply_markup
         ]);
     }
 
-    
+
 
     public function changePosition($bot,$message,$botton)
     {
         Telegram::sendChatAction([
-            'chat_id' => $message['chat']['id'], 
+            'chat_id' => $message['chat']['id'],
             'action' => 'typing'
         ]);
-        $btnActionCacheKey = $message['chat']['id'].'_bottonAction';    
+        $btnActionCacheKey = $message['chat']['id'].$bot->id.'_bottonAction';
         if(Cache::has($btnActionCacheKey))
-        {   
+        {
             $cacheGet = Cache::get($btnActionCacheKey);
             $parent_id = json_decode($cacheGet);
         }
@@ -444,30 +444,30 @@ class BottonController extends Controller
 
         $this->botton->updatePosition($bottonId,$message['text']);
 
-        $cacheKeys = $message['chat']['id'].'_botAlert';    
+        $cacheKeys = $message['chat']['id'].$bot->id.'_botAlert';
         if(Cache::has($cacheKeys))
-        {   
+        {
             Cache::forget($cacheKeys);
         }
-        
-        $keyboard = [  
+
+        $keyboard = [
             [trans('start.PreviusBtn')]
         ];
 
         $reply_markup = Telegram::replyKeyboardMarkup([
-            'keyboard' => $keyboard, 
-            'resize_keyboard' => true, 
+            'keyboard' => $keyboard,
+            'resize_keyboard' => true,
             'one_time_keyboard' => false
         ]);
-        
+
         $html = "
         <i>موقعیت دکمه آپدیت شد</i>
         ";
-        
+
         return Telegram::sendMessage([
             'chat_id' => $message['chat']['id'],
-            'reply_to_message_id' => $message['message_id'], 
-            'text' => $html, 
+            'reply_to_message_id' => $message['message_id'],
+            'text' => $html,
             'parse_mode' => 'HTML',
             'reply_markup' => $reply_markup
         ]);
@@ -481,17 +481,17 @@ class BottonController extends Controller
 
     public function bottonAnswerBotton($bot,$message,$botton)
     {
-        $keyboard = [  
+        $keyboard = [
             [trans('start.showArticle'),trans('start.createFaq')],
             [trans('start.PreviusBtn')]
         ];
 
         $reply_markup = Telegram::replyKeyboardMarkup([
-            'keyboard' => $keyboard, 
-            'resize_keyboard' => true, 
+            'keyboard' => $keyboard,
+            'resize_keyboard' => true,
             'one_time_keyboard' => false
         ]);
-        
+
         $html = "
         <i>مدیریت نوع پاسخ این دکمه :</i>
 
@@ -505,11 +505,11 @@ class BottonController extends Controller
         سوال های طراحی شده توسط شما تکی تکی از کاربر پرسیده مشود و ربات بعد از اتمام سوالات پیام ها را برای شما ارسال میکند.
         </code>
         ";
-        
+
         return Telegram::sendMessage([
             'chat_id' => $message['chat']['id'],
-            'reply_to_message_id' => $message['message_id'], 
-            'text' => $html, 
+            'reply_to_message_id' => $message['message_id'],
+            'text' => $html,
             'parse_mode' => 'HTML',
             'reply_markup' => $reply_markup
         ]);
@@ -522,48 +522,48 @@ class BottonController extends Controller
     public function showArticle‌Botton($bot,$message,$botton)
     {
         Telegram::sendChatAction([
-            'chat_id' => $message['chat']['id'], 
+            'chat_id' => $message['chat']['id'],
             'action' => 'typing'
         ]);
-        $btnActionCacheKey = $message['chat']['id'].'_bottonAction';    
+        $btnActionCacheKey = $message['chat']['id'].$bot->id.'_bottonAction';
         if(Cache::has($btnActionCacheKey))
-        {   
+        {
             $cacheGet = Cache::get($btnActionCacheKey);
             $botton = json_decode($cacheGet);
         }
         $bottonId = (isset($botton) && !empty($botton)) ? $botton[0] : null;
 
-        $cacheKey = $message['chat']['id'].'_bottonArticle';    
+        $cacheKey = $message['chat']['id'].$bot->id.'_bottonArticle';
         if(Cache::has($cacheKey))
-        {   
+        {
             Cache::forget($cacheKey);
         }
         Cache::put($cacheKey, $bottonId, 40320);
 
-        $keyboard = [  
+        $keyboard = [
             [trans('start.PreviusBtn')]
         ];
 
         $reply_markup = Telegram::replyKeyboardMarkup([
-            'keyboard' => $keyboard, 
-            'resize_keyboard' => true, 
+            'keyboard' => $keyboard,
+            'resize_keyboard' => true,
             'one_time_keyboard' => false
         ]);
-        
+
         $html = "
         <i>پیامی که میخواهید این دکمه برای کاربر ارسال کند را ارسال کنید.</i>
 
         <i>پیام شما میتواند تمام فرمت ها (متن - عکس - ویدیو - فایل - صدا - لوکیشن و ...) باشد.</i>
 
         <code>
-        Parse_Mode = HTML        
+        Parse_Mode = HTML
         </code>
         ";
-        
+
         return Telegram::sendMessage([
             'chat_id' => $message['chat']['id'],
-            'reply_to_message_id' => $message['message_id'], 
-            'text' => $html, 
+            'reply_to_message_id' => $message['message_id'],
+            'text' => $html,
             'parse_mode' => 'HTML',
             'reply_markup' => $reply_markup
         ]);
@@ -576,12 +576,12 @@ class BottonController extends Controller
     public function getArticle‌Botton($bot,$message)
     {
         Telegram::sendChatAction([
-            'chat_id' => $message['chat']['id'], 
+            'chat_id' => $message['chat']['id'],
             'action' => 'typing'
         ]);
-        $cacheKey = $message['chat']['id'].'_bottonArticle';  
+        $cacheKey = $message['chat']['id'].$bot->id.'_bottonArticle';
         if(Cache::has($cacheKey))
-        {   
+        {
             $cacheGet = Cache::get($cacheKey);
         }
 
@@ -590,13 +590,13 @@ class BottonController extends Controller
             $response = Telegram::getFile(['file_id' => $message['document']['file_id']]);
             if(isset($response['file_path']))
             {
-                if (!File::exists(storage_path('files'))) 
+                if (!File::exists(storage_path('files')))
                 {
                     File::makeDirectory(storage_path('files'), 0777, true, true);
                 }
                 $uri = "https://api.telegram.org/file/bot".$bot->token."/".$response['file_path'];
                 copy($uri,storage_path('files').'/'.basename($response['file_path']));
-            
+
                 $data = [
                     'type' => 'document',
                     'fileID' => $message['document']['file_id'],
@@ -615,13 +615,13 @@ class BottonController extends Controller
             $response = Telegram::getFile(['file_id' => $message['audio']['file_id']]);
             if(isset($response['file_path']))
             {
-                if (!File::exists(storage_path('files'))) 
+                if (!File::exists(storage_path('files')))
                 {
                     File::makeDirectory(storage_path('files'), 0777, true, true);
                 }
                 $uri = "https://api.telegram.org/file/bot".$bot->token."/".$response['file_path'];
                 copy($uri,storage_path('files').'/'.basename($response['file_path']));
-            
+
                 $data = [
                     'type' => 'audio',
                     'fileID' => $message['audio']['file_id'],
@@ -640,13 +640,13 @@ class BottonController extends Controller
             $response = Telegram::getFile(['file_id' => $message['video']['file_id']]);
             if(isset($response['file_path']))
             {
-                if (!File::exists(storage_path('files'))) 
+                if (!File::exists(storage_path('files')))
                 {
                     File::makeDirectory(storage_path('files'), 0777, true, true);
                 }
                 $uri = "https://api.telegram.org/file/bot".$bot->token."/".$response['file_path'];
                 copy($uri,storage_path('files').'/'.basename($response['file_path']));
-            
+
                 $data = [
                     'type' => 'video',
                     'fileID' => $message['video']['file_id'],
@@ -664,17 +664,17 @@ class BottonController extends Controller
         {
 
             $photo = last(last($message['photo']));
-            
+
             $response = Telegram::getFile(['file_id' => $photo['file_id']]);
             if(isset($response['file_path']))
             {
-                if (!File::exists(storage_path('files'))) 
+                if (!File::exists(storage_path('files')))
                 {
                     File::makeDirectory(storage_path('files'), 0777, true, true);
                 }
                 $uri = "https://api.telegram.org/file/bot".$bot->token."/".$response['file_path'];
                 copy($uri,storage_path('files').'/'.basename($response['file_path']));
-            
+
                 $data = [
                     'type' => 'image',
                     'fileID' => $photo['file_id'],
@@ -690,7 +690,7 @@ class BottonController extends Controller
 
 
         if(isset($message['location']))
-        {  
+        {
                 $data = [
                     'type' => 'location',
                     'fileID' => 'location',
@@ -719,28 +719,28 @@ class BottonController extends Controller
         }
 
 
-        $keyboard = [  
+        $keyboard = [
             [trans('start.doneCreateArticle')],
             [trans('start.PreviusBtn')]
         ];
 
         $reply_markup = Telegram::replyKeyboardMarkup([
-            'keyboard' => $keyboard, 
-            'resize_keyboard' => true, 
+            'keyboard' => $keyboard,
+            'resize_keyboard' => true,
             'one_time_keyboard' => false
         ]);
-        
+
         $html = "
         <i>خب این مطلب ذخیره شد</i>
         <i>اگر مطلب دیگری میخواهید به این دکمه اضافه کنید را ارسال کنید</i>
 
         <i>در غیر این صورت از دکمه اتمام استفاده کنید</i>
         ";
-        
+
         return Telegram::sendMessage([
             'chat_id' => $message['chat']['id'],
-            'reply_to_message_id' => $message['message_id'], 
-            'text' => $html, 
+            'reply_to_message_id' => $message['message_id'],
+            'text' => $html,
             'parse_mode' => 'HTML',
             'reply_markup' => $reply_markup
         ]);
@@ -751,25 +751,25 @@ class BottonController extends Controller
 
     public function doneCreateArticle($bot,$message)
     {
-        $keyboard = [  
+        $keyboard = [
             [trans('start.ascArticleSort'),trans('start.descArticleSort')],
             [trans('start.PreviusBtn')]
         ];
 
         $reply_markup = Telegram::replyKeyboardMarkup([
-            'keyboard' => $keyboard, 
-            'resize_keyboard' => true, 
+            'keyboard' => $keyboard,
+            'resize_keyboard' => true,
             'one_time_keyboard' => false
         ]);
-        
+
         $html = "
         <i>پاسخ های این دکمه چگونه ارسال شوند?</i>
         ";
-        
+
         return Telegram::sendMessage([
             'chat_id' => $message['chat']['id'],
-            'reply_to_message_id' => $message['message_id'], 
-            'text' => $html, 
+            'reply_to_message_id' => $message['message_id'],
+            'text' => $html,
             'parse_mode' => 'HTML',
             'reply_markup' => $reply_markup
         ]);
@@ -780,38 +780,38 @@ class BottonController extends Controller
     public function ascArticleSort($bot,$message)
     {
         Telegram::sendChatAction([
-            'chat_id' => $message['chat']['id'], 
+            'chat_id' => $message['chat']['id'],
             'action' => 'typing'
         ]);
-        $cacheKey = $message['chat']['id'].'_bottonArticle';  
+        $cacheKey = $message['chat']['id'].$bot->id.'_bottonArticle';
         if(Cache::has($cacheKey))
-        {   
+        {
             $cacheGet = Cache::get($cacheKey);
         }
 
         $this->botton->updateBottonData($bot->id,$cacheGet,'ASC');
-    
+
         Cache::forget($cacheKey);
 
-        $keyboard = [  
+        $keyboard = [
             [trans('start.PreviusBtn')]
         ];
 
         $reply_markup = Telegram::replyKeyboardMarkup([
-            'keyboard' => $keyboard, 
-            'resize_keyboard' => true, 
+            'keyboard' => $keyboard,
+            'resize_keyboard' => true,
             'one_time_keyboard' => false
         ]);
-        
+
         $html = "
         <i>پاسخ ها با موفقیت اضافه شدند</i>
         <i>برای ویرایش پاسخ ها از دکمه ویرایش پاسخ فعلی استفاده کنید</i>
         ";
-        
+
         return Telegram::sendMessage([
             'chat_id' => $message['chat']['id'],
-            'reply_to_message_id' => $message['message_id'], 
-            'text' => $html, 
+            'reply_to_message_id' => $message['message_id'],
+            'text' => $html,
             'parse_mode' => 'HTML',
             'reply_markup' => $reply_markup
         ]);
@@ -822,38 +822,38 @@ class BottonController extends Controller
     public function descArticleSort($bot,$message)
     {
         Telegram::sendChatAction([
-            'chat_id' => $message['chat']['id'], 
+            'chat_id' => $message['chat']['id'],
             'action' => 'typing'
         ]);
-        $cacheKey = $message['chat']['id'].'_bottonArticle';  
+        $cacheKey = $message['chat']['id'].$bot->id.'_bottonArticle';
         if(Cache::has($cacheKey))
-        {   
+        {
             $cacheGet = Cache::get($cacheKey);
         }
 
         $this->botton->updateBottonData($bot->id,$cacheGet,'DESC');
-    
+
         Cache::forget($cacheKey);
 
-        $keyboard = [  
+        $keyboard = [
             [trans('start.PreviusBtn')]
         ];
 
         $reply_markup = Telegram::replyKeyboardMarkup([
-            'keyboard' => $keyboard, 
-            'resize_keyboard' => true, 
+            'keyboard' => $keyboard,
+            'resize_keyboard' => true,
             'one_time_keyboard' => false
         ]);
-        
+
         $html = "
         <i>پاسخ ها با موفقیت اضافه شدند</i>
         <i>برای ویرایش پاسخ ها از دکمه ویرایش پاسخ فعلی استفاده کنید</i>
         ";
-        
+
         return Telegram::sendMessage([
             'chat_id' => $message['chat']['id'],
-            'reply_to_message_id' => $message['message_id'], 
-            'text' => $html, 
+            'reply_to_message_id' => $message['message_id'],
+            'text' => $html,
             'parse_mode' => 'HTML',
             'reply_markup' => $reply_markup
         ]);
@@ -864,15 +864,15 @@ class BottonController extends Controller
 
     public function UerBottonActions($bot, $message, $botton)
     {
-        $cacheKey = $message['chat']['id'].'_userBottonAction';    
+        $cacheKey = $message['chat']['id'].$bot->id.'_userBottonAction';
         if(Cache::has($cacheKey))
-        {   
+        {
             Cache::forget($cacheKey);
         }
         Cache::put($cacheKey, json_encode([$botton->id,$botton->parent_id]), 40320);
 
         Telegram::sendChatAction([
-            'chat_id' => $message['chat']['id'], 
+            'chat_id' => $message['chat']['id'],
             'action' => 'typing'
           ]);
 
@@ -881,7 +881,7 @@ class BottonController extends Controller
 
         $encodeBtn = json_encode($groupBottons);
         $decodeBtn = json_decode($encodeBtn,true);
-        $keyboards = []; 
+        $keyboards = [];
         foreach($decodeBtn as $key => $gb)
         {
             $btn = array_column($gb,'name');
@@ -891,12 +891,12 @@ class BottonController extends Controller
 
         $keyboard = $keyboards;
 
-       
+
         $bottonData = $this->botton->bottonData($bot->id,$botton->id);
 
         $reply_markup = Telegram::replyKeyboardMarkup([
-            'keyboard' => $keyboard, 
-            'resize_keyboard' => true, 
+            'keyboard' => $keyboard,
+            'resize_keyboard' => true,
             'one_time_keyboard' => false
         ]);
 
@@ -904,18 +904,18 @@ class BottonController extends Controller
         <i>".$botton->name."</i>
         ";
         Telegram::sendChatAction([
-            'chat_id' => $message['chat']['id'], 
+            'chat_id' => $message['chat']['id'],
             'action' => 'typing'
         ]);
 
         Telegram::sendMessage([
             'chat_id' => $message['chat']['id'],
-            'reply_to_message_id' => $message['message_id'], 
-            'text' => $html, 
+            'reply_to_message_id' => $message['message_id'],
+            'text' => $html,
             'parse_mode' => 'HTML',
             'reply_markup' => $reply_markup
         ]);
-        
+
 
         foreach($bottonData as $data)
         {
@@ -924,7 +924,7 @@ class BottonController extends Controller
                 case 'image':
 
                     Telegram::sendChatAction([
-                        'chat_id' => $message['chat']['id'], 
+                        'chat_id' => $message['chat']['id'],
                         'action' => 'upload_photo'
                     ]);
                     Telegram::sendPhoto([
@@ -936,7 +936,7 @@ class BottonController extends Controller
                 case 'video':
 
                         Telegram::sendChatAction([
-                            'chat_id' => $message['chat']['id'], 
+                            'chat_id' => $message['chat']['id'],
                             'action' => 'upload_video'
                         ]);
                         Telegram::sendAudio([
@@ -945,11 +945,11 @@ class BottonController extends Controller
                         ]);
                         break;
 
-                        
+
                 case 'audio':
 
                     Telegram::sendChatAction([
-                        'chat_id' => $message['chat']['id'], 
+                        'chat_id' => $message['chat']['id'],
                         'action' => 'upload_audio'
                     ]);
                     Telegram::sendAudio([
@@ -957,11 +957,11 @@ class BottonController extends Controller
                         'audio' => $data['data'],
                     ]);
                     break;
-         
+
                 case 'document':
 
                     Telegram::sendChatAction([
-                        'chat_id' => $message['chat']['id'], 
+                        'chat_id' => $message['chat']['id'],
                         'action' => 'upload_document'
                     ]);
                     Telegram::sendDocument([
@@ -969,11 +969,11 @@ class BottonController extends Controller
                         'document' => $data['data'],
                     ]);
                     break;
- 
+
                 case 'location':
 
                     Telegram::sendChatAction([
-                        'chat_id' => $message['chat']['id'], 
+                        'chat_id' => $message['chat']['id'],
                         'action' => 'find_location'
                     ]);
                     $location = json_decode($data['data']);
@@ -983,16 +983,16 @@ class BottonController extends Controller
 	                    'longitude' => $location->longitude,
                     ]);
                     break;
-              
+
                 case 'text':
 
                     Telegram::sendChatAction([
-                        'chat_id' => $message['chat']['id'], 
+                        'chat_id' => $message['chat']['id'],
                         'action' => 'typing'
                     ]);
                      Telegram::sendMessage([
                         'chat_id' => $message['chat']['id'],
-                        'text' => "<i>".$data['data']."</i>", 
+                        'text' => "<i>".$data['data']."</i>",
                         'parse_mode' => 'HTML',
                     ]);
                     break;
