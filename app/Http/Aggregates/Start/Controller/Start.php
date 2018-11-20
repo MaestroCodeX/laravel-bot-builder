@@ -22,7 +22,7 @@ class StartController extends Controller
     }
 
     public function init($botID)
-    {
+    {  
             $bot = $this->bot->getBot($botID);
             if($bot !== null)
             {
@@ -38,7 +38,7 @@ class StartController extends Controller
             $updates = Telegram::getWebhookUpdates();
             return app(AdminBotController::class)->AdminBot($updates);
     }
-  
+
 
 
 }

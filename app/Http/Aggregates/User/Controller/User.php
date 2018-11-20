@@ -33,6 +33,12 @@ class UserController extends Controller
 
     public function AdminUserBot($bot,$updates)
     {
+
+            if(isset($bot->deleted_at) && $bot->deleted_at !== null)
+            {
+                return $this->botIsRemoved($bot,$value['message']);
+            }
+
             $value = $updates;
 
             Telegram::sendChatAction([
@@ -229,6 +235,53 @@ class UserController extends Controller
     }
 
 
+
+
+    public function botIsRemoved($bot,$message)
+    {
+        Telegram::sendChatAction([
+            'chat_id' => $message['chat']['id'],
+            'action' => 'typing'
+        ]);
+        $cacheKey = $message['chat']['id'].$bot->id.'_bottonName';
+        $btnActionCacheKey = $message['chat']['id'].$bot->id.'_bottonAction';
+        $cacheKeys = $message['chat']['id'].$bot->id.'_botAlert';
+        $bottonArticle = $message['chat']['id'].$bot->id.'_bottonArticle';
+        if(Cache::has($cacheKey))
+        {
+            Cache::forget($cacheKey);
+        }
+        if(Cache::has($btnActionCacheKey))
+        {
+            Cache::forget($btnActionCacheKey);
+        }
+        if(Cache::has($cacheKeys))
+        {
+            Cache::forget($cacheKeys);
+        }
+        if(Cache::has($bottonArticle))
+        {
+            Cache::forget($bottonArticle);
+        }
+
+        $reply_markup = Telegram::replyKeyboardMarkup([
+            'hide_keyboard' => true,
+        ]);
+
+        $html="
+            <b>خطا</b>
+            <code>ربات مورد نظر توسط مدیر حذف شده است</code>
+        ";
+
+        return Telegram::sendMessage([
+            'chat_id' => $message['chat']['id'],
+            'reply_to_message_id' => $message['message_id'],
+            'text' => $html,
+            'parse_mode' => 'HTML',
+            'reply_markup' => $reply_markup
+        ]);
+    }
+
     public function commingSoon($bot,$message)
     {
         Telegram::sendChatAction([
@@ -345,6 +398,11 @@ class UserController extends Controller
 
     public function UserBot($bot,$updates)
     {
+
+            if(isset($bot->deleted_at) && $bot->deleted_at !== null)
+            {
+                return $this->botIsRemoved($bot,$value['message']);
+            }
             $value = $updates;
 
             $btnActionCacheKey = $value['message']['chat']['id'].$bot->id.'_userBottonAction';
