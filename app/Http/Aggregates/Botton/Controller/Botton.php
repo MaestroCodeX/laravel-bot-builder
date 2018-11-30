@@ -623,9 +623,9 @@ class BottonController extends Controller
                 }
                 Cache::put($cacheKeyCaption, $message['document']['file_id'], 40320);
                 $keyboard = [
+                    [trans('start.addCaption')],
                     [trans('start.doneCreateArticle')],
-                    [trans('start.PreviusBtn')],
-                    [trans('start.addCaption')]
+                    [trans('start.PreviusBtn')]
                 ];
             }
         }
@@ -742,9 +742,9 @@ class BottonController extends Controller
                 }
                 Cache::put($cacheKeyCaption, $photo['file_id'], 40320);
                 $keyboard = [
+                    [trans('start.addCaption')],
                     [trans('start.doneCreateArticle')],
-                    [trans('start.PreviusBtn')],
-                    [trans('start.addCaption')]
+                    [trans('start.PreviusBtn')]
                 ];
             }
         }
@@ -814,6 +814,27 @@ class BottonController extends Controller
         ]);
     }
 
+
+    public function captionMessage($bot,$message)
+    {
+        $html = "
+                    <i>کپشن خود را برای فایل مورد نظر ارسال کنید</i>     
+                    
+                    <code>حداکثر 1024 کاراکتر</code>       
+             ";
+
+        $reply_markup = Telegram::replyKeyboardMarkup([
+            'hide_keyboard' => true
+        ]);
+
+        return Telegram::sendMessage([
+            'chat_id' => $message['chat']['id'],
+            'reply_to_message_id' => $message['message_id'],
+            'text' => $html,
+            'parse_mode' => 'HTML',
+            'reply_markup' => $reply_markup
+        ]);
+    }
 
 
     public function getFileCaption($bot,$message)

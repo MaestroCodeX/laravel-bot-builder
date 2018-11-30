@@ -108,6 +108,8 @@ class UserController extends Controller
                         return app(BottonController::class)->doneCreateArticle($bot,$value['message']);
                     case trans('start.ascArticleSort'):
                         return app(BottonController::class)->ascArticleSort($bot,$value['message']);
+                    case trans('start.addCaption'):
+                        return app(BottonController::class)->captionMessage($bot,$value['message']);
                     case trans('start.descArticleSort'):
                         return app(BottonController::class)->descArticleSort($bot,$value['message']);
                     case Cache::has($value['message']['chat']['id'].$bot->id.'_bottonCaption'):
