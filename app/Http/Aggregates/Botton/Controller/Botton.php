@@ -590,20 +590,20 @@ class BottonController extends Controller
             $response = Telegram::getFile(['file_id' => $message['document']['file_id']]);
             if(isset($response['file_path']))
             {
-                if (!File::exists(storage_path('files')))
+                if (!File::exists(storage_path('files/'.$bot->id.'/document')))
                 {
-                    File::makeDirectory(storage_path('files'), 0777, true, true);
+                    File::makeDirectory(storage_path('files/'.$bot->id.'/document'), 0777, true, true);
                 }
                 $uniqid = uniqid("document",true);
                 $uri = "https://api.telegram.org/file/bot".$bot->token."/".$response['file_path'];
-                copy($uri,storage_path('files').'/'.$uniqid.basename($response['file_path']));
+                copy($uri,storage_path('files/'.$bot->id.'/document').'/'.$uniqid.basename($response['file_path']));
 
                 $data = [
                     'type' => 'document',
                     'fileID' => $message['document']['file_id'],
                     'fileSize' => $message['document']['file_size'],
                     'sort' => 'ASC',
-                    'data' => storage_path('files').'/'.$uniqid.basename($response['file_path']),
+                    'data' => storage_path('files/'.$bot->id.'/document').'/'.$uniqid.basename($response['file_path']),
                     'bot_id' => $bot->id,
                     'botton_id' => $cacheGet
                 ];
@@ -636,20 +636,20 @@ class BottonController extends Controller
             $response = Telegram::getFile(['file_id' => $message['audio']['file_id']]);
             if(isset($response['file_path']))
             {
-                if (!File::exists(storage_path('files')))
+                if (!File::exists(storage_path('files/'.$bot->id.'/audio')))
                 {
-                    File::makeDirectory(storage_path('files'), 0777, true, true);
+                    File::makeDirectory(storage_path('files/'.$bot->id.'/audio'), 0777, true, true);
                 }
                 $uniqid = uniqid("audio",true);
                 $uri = "https://api.telegram.org/file/bot".$bot->token."/".$response['file_path'];
-                copy($uri,storage_path('files').'/'.$uniqid.basename($response['file_path']));
+                copy($uri,storage_path('files/'.$bot->id.'/audio').'/'.$uniqid.basename($response['file_path']));
 
                 $data = [
                     'type' => 'audio',
                     'fileID' => $message['audio']['file_id'],
                     'fileSize' => $message['audio']['file_size'],
                     'sort' => 'ASC',
-                    'data' => storage_path('files').'/'.$uniqid.basename($response['file_path']),
+                    'data' => storage_path('files/'.$bot->id.'/audio').'/'.$uniqid.basename($response['file_path']),
                     'bot_id' => $bot->id,
                     'botton_id' => $cacheGet
                 ];
@@ -672,20 +672,20 @@ class BottonController extends Controller
             $response = Telegram::getFile(['file_id' => $message['video']['file_id']]);
             if(isset($response['file_path']))
             {
-                if (!File::exists(storage_path('files')))
+                if (!File::exists(storage_path('files/'.$bot->id.'/video')))
                 {
-                    File::makeDirectory(storage_path('files'), 0777, true, true);
+                    File::makeDirectory(storage_path('files/'.$bot->id.'/video'), 0777, true, true);
                 }
                 $uniqid = uniqid("video",true);
                 $uri = "https://api.telegram.org/file/bot".$bot->token."/".$response['file_path'];
-                copy($uri,storage_path('files').'/'.$uniqid.basename($response['file_path']));
+                copy($uri,storage_path('files/'.$bot->id.'/video').'/'.$uniqid.basename($response['file_path']));
 
                 $data = [
                     'type' => 'video',
                     'fileID' => $message['video']['file_id'],
                     'fileSize' => $message['video']['file_size'],
                     'sort' => 'ASC',
-                    'data' => storage_path('files').'/'.$uniqid.basename($response['file_path']),
+                    'data' => storage_path('files/'.$bot->id.'/video').'/'.$uniqid.basename($response['file_path']),
                     'bot_id' => $bot->id,
                     'botton_id' => $cacheGet
                 ];
@@ -705,26 +705,25 @@ class BottonController extends Controller
 
         if(isset($message['photo']))
         {
-
             $photo = last(last($message['photo']));
 
             $response = Telegram::getFile(['file_id' => $photo['file_id']]);
             if(isset($response['file_path']))
             {
-                if (!File::exists(storage_path('files')))
+                if (!File::exists(storage_path('files/'.$bot->id.'/photo')))
                 {
-                    File::makeDirectory(storage_path('files'), 0777, true, true);
+                    File::makeDirectory(storage_path('files/'.$bot->id.'/photo'), 0777, true, true);
                 }
                 $uniqid = uniqid("photo",true);
                 $uri = "https://api.telegram.org/file/bot".$bot->token."/".$response['file_path'];
-                copy($uri,storage_path('files').'/'.$uniqid.basename($response['file_path']));
+                copy($uri,storage_path('files/'.$bot->id.'/photo').'/'.$uniqid.basename($response['file_path']));
 
                 $data = [
                     'type' => 'image',
                     'fileID' => $photo['file_id'],
                     'fileSize' => $photo['file_size'],
                     'sort' => 'ASC',
-                    'data' => storage_path('files').'/'.$uniqid.basename($response['file_path']),
+                    'data' => storage_path('files/'.$bot->id.'/photo').'/'.$uniqid.basename($response['file_path']),
                     'bot_id' => $bot->id,
                     'botton_id' => $cacheGet
                 ];
