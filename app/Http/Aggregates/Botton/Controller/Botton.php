@@ -1,6 +1,7 @@
 <?php   namespace App\Http\Aggregates\Botton\Controller;
 
 use File;
+use GuzzleHttp\Client;
 use Telegram;
 use Telegram\Bot\Api;
 use App\Http\Controllers\Controller;
@@ -9,6 +10,7 @@ use App\Http\Aggregates\User\Controller\UserController;
 use App\Http\Aggregates\User\Contract\UserContract as User;
 use App\Http\Aggregates\AdminBot\Controller\AdminBotController;
 use App\Http\Aggregates\Botton\Contract\BottonContract as Botton;
+use Exception;
 
 class BottonController extends Controller
 {
@@ -1215,42 +1217,72 @@ class BottonController extends Controller
             $text = '@'.$message['text'];
         }
 
-        $this->botton->createBotChannel($bot->id,$text);
-
-        $cacheKey = $message['chat']['id'].$bot->id.'_requiredJoinAction';
-        if(Cache::has($cacheKey))
+        try
         {
-            Cache::forget($cacheKey);
-        }
+            $client = new Client();
+            $api = "https://api.telegram.org/bot".$bot->token."/getChat?chat_id=".$text;
+            $client->request('GET',$api)->getBody();
 
-        $keyboard = [
-            [trans('start.inactiveRequiredJoin')],
-            [trans('start.PreviusBtn')]
-        ];
+            $this->botton->createBotChannel($bot->id,$text);
 
-        $reply_markup = Telegram::replyKeyboardMarkup([
-            'keyboard' => $keyboard,
-            'resize_keyboard' => true,
-            'one_time_keyboard' => false
-        ]);
+            $cacheKey = $message['chat']['id'].$bot->id.'_requiredJoinAction';
+            if(Cache::has($cacheKey))
+            {
+                Cache::forget($cacheKey);
+            }
 
-        $html = "
+            $keyboard = [
+                [trans('start.inactiveRequiredJoin')],
+                [trans('start.PreviusBtn')]
+            ];
+
+            $reply_markup = Telegram::replyKeyboardMarkup([
+                'keyboard' => $keyboard,
+                'resize_keyboard' => true,
+                'one_time_keyboard' => false
+            ]);
+
+            $html = "
             <i> عضویت اجباری در کانال شما برای دسترسی به بات فعال شد</i>            
         ";
 
-        return Telegram::sendMessage([
-            'chat_id' => $message['chat']['id'],
-            'reply_to_message_id' => $message['message_id'],
-            'text' => $html,
-            'parse_mode' => 'HTML',
-            'reply_markup' => $reply_markup
-        ]);
+            return Telegram::sendMessage([
+                'chat_id' => $message['chat']['id'],
+                'reply_to_message_id' => $message['message_id'],
+                'text' => $html,
+                'parse_mode' => 'HTML',
+                'reply_markup' => $reply_markup
+            ]);
+        }
+        catch(Exception $e)
+        {
+            $keyboard = [
+                [trans('start.PreviusBtn')]
+            ];
+
+            $reply_markup = Telegram::replyKeyboardMarkup([
+                'keyboard' => $keyboard,
+                'resize_keyboard' => true,
+                'one_time_keyboard' => false
+            ]);
+
+            $html = "
+                <i>  اطلاعات کانال ارسال شده وجود ندارد</i>            
+            ";
+
+            return Telegram::sendMessage([
+                'chat_id' => $message['chat']['id'],
+                'reply_to_message_id' => $message['message_id'],
+                'text' => $html,
+                'parse_mode' => 'HTML',
+                'reply_markup' => $reply_markup
+            ]);
+        }
     }
 
 
     public function inactiveBotJoin($bot,$message)
     {
-
         $this->botton->deleteChannelBot($bot->id);
         $keyboard = [
             [trans('start.PreviusBtn')]
