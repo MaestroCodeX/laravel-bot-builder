@@ -640,7 +640,7 @@ class BottonController extends Controller
                 {
                     File::makeDirectory(storage_path('files'), 0777, true, true);
                 }
-                $uniqid = uniqid("document",true);
+                $uniqid = uniqid("audio",true);
                 $uri = "https://api.telegram.org/file/bot".$bot->token."/".$response['file_path'];
                 copy($uri,storage_path('files').'/'.$uniqid.basename($response['file_path']));
 
@@ -676,7 +676,7 @@ class BottonController extends Controller
                 {
                     File::makeDirectory(storage_path('files'), 0777, true, true);
                 }
-                $uniqid = uniqid("document",true);
+                $uniqid = uniqid("video",true);
                 $uri = "https://api.telegram.org/file/bot".$bot->token."/".$response['file_path'];
                 copy($uri,storage_path('files').'/'.$uniqid.basename($response['file_path']));
 
@@ -715,7 +715,7 @@ class BottonController extends Controller
                 {
                     File::makeDirectory(storage_path('files'), 0777, true, true);
                 }
-                $uniqid = uniqid("document",true);
+                $uniqid = uniqid("photo",true);
                 $uri = "https://api.telegram.org/file/bot".$bot->token."/".$response['file_path'];
                 copy($uri,storage_path('files').'/'.$uniqid.basename($response['file_path']));
 
