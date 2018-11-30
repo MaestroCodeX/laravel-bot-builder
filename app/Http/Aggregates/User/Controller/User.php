@@ -34,12 +34,12 @@ class UserController extends Controller
     public function AdminUserBot($bot,$updates)
     {
 
+            $value = $updates;
+
             if(isset($bot->deleted_at) && $bot->deleted_at !== null)
             {
                 return $this->botIsRemoved($bot,$value['message']);
             }
-
-            $value = $updates;
 
             Telegram::sendChatAction([
                 'chat_id' => $value['message']['chat']['id'],
@@ -398,12 +398,12 @@ class UserController extends Controller
 
     public function UserBot($bot,$updates)
     {
+            $value = $updates;
 
             if(isset($bot->deleted_at) && $bot->deleted_at !== null)
             {
                 return $this->botIsRemoved($bot,$value['message']);
             }
-            $value = $updates;
 
             $btnActionCacheKey = $value['message']['chat']['id'].$bot->id.'_userBottonAction';
             if(Cache::has($btnActionCacheKey))
