@@ -1,7 +1,7 @@
 <?php   namespace App\Http\Aggregates\Botton\Controller;
 
-use Illuminate\Support\Facades\File;
-use Illuminate\Support\Facades\Storage;
+use File;
+use Storage;
 use Telegram;
 use Telegram\Bot\Api;
 use App\Http\Controllers\Controller;
