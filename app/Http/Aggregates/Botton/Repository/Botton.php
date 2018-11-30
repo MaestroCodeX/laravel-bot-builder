@@ -23,6 +23,11 @@ class BottonRepository implements BottonContract
         $BottonData = BottonData::where('bot_id',$bot_id)->where('botton_id',$botton_id)->first();
         return BottonData::where('bot_id',$bot_id)->where('botton_id',$botton_id)->orderBy('created_at',$BottonData->sort)->get();
     }
+
+    public function updateFileCaption($fileID,$text)
+    {
+        return BottonData::where("fileID",'=',$fileID)->update(["caption"=>$text]);
+    }
   
     public function createBotton($data)
     {

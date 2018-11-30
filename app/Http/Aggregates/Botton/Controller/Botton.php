@@ -607,6 +607,26 @@ class BottonController extends Controller
                     'botton_id' => $cacheGet
                 ];
                 $this->botton->createBottonData($data);
+                $html = "
+                <i>خب این مطلب ذخیره شد</i>
+                
+                <i>اگر قصد اضافه کردن کپشن برای این فایل را دارید روی دکمه 'اضافه کردن کپشن' بزنید</i>
+                
+                <i> در غیر اینصورت اگر مطلب دیگری میخواهید به این دکمه اضافه کنید را ارسال کنید</i>
+                
+                <i>  و در غیر این صورت از دکمه اتمام استفاده کنید</i>
+                ";
+                $cacheKeyCaption = $message['chat']['id'].$bot->id.'_bottonCaption';
+                if(Cache::has($cacheKeyCaption))
+                {
+                    Cache::forget($cacheKeyCaption);
+                }
+                Cache::put($cacheKeyCaption, $message['document']['file_id'], 40320);
+                $keyboard = [
+                    [trans('start.doneCreateArticle')],
+                    [trans('start.PreviusBtn')],
+                    [trans('start.addCaption')]
+                ];
             }
         }
 
@@ -632,6 +652,16 @@ class BottonController extends Controller
                     'botton_id' => $cacheGet
                 ];
                 $this->botton->createBottonData($data);
+                $html = "
+                    <i>خب این مطلب ذخیره شد</i>
+                    <i>اگر مطلب دیگری میخواهید به این دکمه اضافه کنید را ارسال کنید</i>
+            
+                    <i>در غیر این صورت از دکمه اتمام استفاده کنید</i>
+                ";
+                $keyboard = [
+                    [trans('start.doneCreateArticle')],
+                    [trans('start.PreviusBtn')]
+                ];
             }
         }
 
@@ -657,6 +687,16 @@ class BottonController extends Controller
                     'botton_id' => $cacheGet
                 ];
                 $this->botton->createBottonData($data);
+                $html = "
+                    <i>خب این مطلب ذخیره شد</i>
+                    <i>اگر مطلب دیگری میخواهید به این دکمه اضافه کنید را ارسال کنید</i>
+            
+                    <i>در غیر این صورت از دکمه اتمام استفاده کنید</i>
+                ";
+                $keyboard = [
+                    [trans('start.doneCreateArticle')],
+                    [trans('start.PreviusBtn')]
+                ];
             }
         }
 
@@ -685,6 +725,27 @@ class BottonController extends Controller
                     'botton_id' => $cacheGet
                 ];
                 $this->botton->createBottonData($data);
+
+                $html = "
+                <i>خب این مطلب ذخیره شد</i>
+                
+                <i>اگر قصد اضافه کردن کپشن برای این تصویر را دارید روی دکمه 'اضافه کردن کپشن' بزنید</i>
+                
+                <i> در غیر اینصورت اگر مطلب دیگری میخواهید به این دکمه اضافه کنید را ارسال کنید</i>
+                
+                <i>  و در غیر این صورت از دکمه اتمام استفاده کنید</i>
+                ";
+                $cacheKeyCaption = $message['chat']['id'].$bot->id.'_bottonCaption';
+                if(Cache::has($cacheKeyCaption))
+                {
+                    Cache::forget($cacheKeyCaption);
+                }
+                Cache::put($cacheKeyCaption, $photo['file_id'], 40320);
+                $keyboard = [
+                    [trans('start.doneCreateArticle')],
+                    [trans('start.PreviusBtn')],
+                    [trans('start.addCaption')]
+                ];
             }
         }
 
@@ -701,6 +762,16 @@ class BottonController extends Controller
                     'botton_id' => $cacheGet
                 ];
                 $this->botton->createBottonData($data);
+                $html = "
+                    <i>خب این مطلب ذخیره شد</i>
+                    <i>اگر مطلب دیگری میخواهید به این دکمه اضافه کنید را ارسال کنید</i>
+            
+                    <i>در غیر این صورت از دکمه اتمام استفاده کنید</i>
+                ";
+                $keyboard = [
+                    [trans('start.doneCreateArticle')],
+                    [trans('start.PreviusBtn')]
+                ];
         }
 
 
@@ -716,26 +787,23 @@ class BottonController extends Controller
                 'botton_id' => $cacheGet
             ];
             $this->botton->createBottonData($data);
+            $html = "
+                    <i>خب این مطلب ذخیره شد</i>
+                    <i>اگر مطلب دیگری میخواهید به این دکمه اضافه کنید را ارسال کنید</i>
+            
+                    <i>در غیر این صورت از دکمه اتمام استفاده کنید</i>
+              ";
+            $keyboard = [
+                [trans('start.doneCreateArticle')],
+                [trans('start.PreviusBtn')]
+            ];
         }
-
-
-        $keyboard = [
-            [trans('start.doneCreateArticle')],
-            [trans('start.PreviusBtn')]
-        ];
 
         $reply_markup = Telegram::replyKeyboardMarkup([
             'keyboard' => $keyboard,
             'resize_keyboard' => true,
             'one_time_keyboard' => false
         ]);
-
-        $html = "
-        <i>خب این مطلب ذخیره شد</i>
-        <i>اگر مطلب دیگری میخواهید به این دکمه اضافه کنید را ارسال کنید</i>
-
-        <i>در غیر این صورت از دکمه اتمام استفاده کنید</i>
-        ";
 
         return Telegram::sendMessage([
             'chat_id' => $message['chat']['id'],
@@ -748,9 +816,52 @@ class BottonController extends Controller
 
 
 
+    public function getFileCaption($bot,$message)
+    {
+        $cacheKeyCaption = $message['chat']['id'].$bot->id.'_bottonCaption';
+        if(Cache::has($cacheKeyCaption))
+        {
+            $key = Cache::get($cacheKeyCaption);
+        }
+        $this->botton->updateFileCaption($key,$message['text']);
+
+        Cache::forget($cacheKeyCaption);
+
+        $html = "
+                    <i>خب کپشن دخیره شد</i>
+                    <i>اگر مطلب دیگری میخواهید به این دکمه اضافه کنید را ارسال کنید</i>
+            
+                    <i>در غیر این صورت از دکمه اتمام استفاده کنید</i>
+              ";
+        $keyboard = [
+            [trans('start.doneCreateArticle')],
+            [trans('start.PreviusBtn')]
+        ];
+
+        $reply_markup = Telegram::replyKeyboardMarkup([
+            'keyboard' => $keyboard,
+            'resize_keyboard' => true,
+            'one_time_keyboard' => false
+        ]);
+
+        return Telegram::sendMessage([
+            'chat_id' => $message['chat']['id'],
+            'reply_to_message_id' => $message['message_id'],
+            'text' => $html,
+            'parse_mode' => 'HTML',
+            'reply_markup' => $reply_markup
+        ]);
+    }
+
+
 
     public function doneCreateArticle($bot,$message)
     {
+        $cacheKeyCaption = $message['chat']['id'].$bot->id.'_bottonCaption';
+        if(Cache::has($cacheKeyCaption))
+        {
+            Cache::forget($cacheKeyCaption);
+        }
         $keyboard = [
             [trans('start.ascArticleSort'),trans('start.descArticleSort')],
             [trans('start.PreviusBtn')]
@@ -927,10 +1038,21 @@ class BottonController extends Controller
                         'chat_id' => $message['chat']['id'],
                         'action' => 'upload_photo'
                     ]);
-                    Telegram::sendPhoto([
-                        'chat_id' => $message['chat']['id'],
-                        'photo' => $data['data'],
-                    ]);
+                    if(isset($data['caption']) && !is_null($data['caption']))
+                    {
+                        Telegram::sendPhoto([
+                            'chat_id' => $message['chat']['id'],
+                            'photo' => $data['data'],
+                            'caption' => $data['caption']
+                        ]);
+                    }
+                    else
+                    {
+                        Telegram::sendPhoto([
+                            'chat_id' => $message['chat']['id'],
+                            'photo' => $data['data']
+                        ]);
+                    }
                     break;
 
                 case 'video':
@@ -964,10 +1086,21 @@ class BottonController extends Controller
                         'chat_id' => $message['chat']['id'],
                         'action' => 'upload_document'
                     ]);
-                    Telegram::sendDocument([
-                        'chat_id' => $message['chat']['id'],
-                        'document' => $data['data'],
-                    ]);
+                    if(isset($data['caption']) && !is_null($data['caption']))
+                    {
+                        Telegram::sendDocument([
+                            'chat_id' => $message['chat']['id'],
+                            'document' => $data['data'],
+                            'caption' => $data['caption']
+                        ]);
+                    }
+                    else
+                    {
+                        Telegram::sendDocument([
+                            'chat_id' => $message['chat']['id'],
+                            'document' => $data['data'],
+                        ]);
+                    }
                     break;
 
                 case 'location':

@@ -35,5 +35,5 @@ return [
 	'doneCreateArticle' => 'اتمام',
 	'ascArticleSort' => 'قدیمی به جدید',
 	'descArticleSort' => 'جدید به قدیم',
-
+    'addCaption' => 'اضافه کردن کپشن'
 ];

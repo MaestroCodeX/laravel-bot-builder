@@ -110,6 +110,8 @@ class UserController extends Controller
                         return app(BottonController::class)->ascArticleSort($bot,$value['message']);
                     case trans('start.descArticleSort'):
                         return app(BottonController::class)->descArticleSort($bot,$value['message']);
+                    case Cache::has($value['message']['chat']['id'].$bot->id.'_bottonCaption'):
+                        return app(BottonController::class)->getFileCaption($bot,$value['message']);
                     case Cache::has($value['message']['chat']['id'].$bot->id.'_bottonArticle'):
                         return app(BottonController::class)->getArticle‌Botton($bot,$value['message']);
                     case trans('start.createFaq'):
@@ -140,6 +142,11 @@ class UserController extends Controller
         $btnActionCacheKey = $message['chat']['id'].$bot->id.'_bottonAction';
         $cacheKeys = $message['chat']['id'].$bot->id.'_botAlert';
         $bottonArticle = $message['chat']['id'].$bot->id.'_bottonArticle';
+        $cacheKeyCaption = $message['chat']['id'].$bot->id.'_bottonCaption';
+        if(Cache::has($cacheKeyCaption))
+        {
+            Cache::forget($cacheKeyCaption);
+        }
         if(Cache::has($cacheKey))
         {
             Cache::forget($cacheKey);
@@ -192,6 +199,11 @@ class UserController extends Controller
         $btnActionCacheKey = $message['chat']['id'].$bot->id.'_bottonAction';
         $cacheKeys = $message['chat']['id'].$bot->id.'_botAlert';
         $bottonArticle = $message['chat']['id'].$bot->id.'_bottonArticle';
+        $cacheKeyCaption = $message['chat']['id'].$bot->id.'_bottonCaption';
+        if(Cache::has($cacheKeyCaption))
+        {
+            Cache::forget($cacheKeyCaption);
+        }
         if(Cache::has($cacheKey))
         {
             Cache::forget($cacheKey);
@@ -247,6 +259,11 @@ class UserController extends Controller
         $btnActionCacheKey = $message['chat']['id'].$bot->id.'_bottonAction';
         $cacheKeys = $message['chat']['id'].$bot->id.'_botAlert';
         $bottonArticle = $message['chat']['id'].$bot->id.'_bottonArticle';
+        $cacheKeyCaption = $message['chat']['id'].$bot->id.'_bottonCaption';
+        if(Cache::has($cacheKeyCaption))
+        {
+            Cache::forget($cacheKeyCaption);
+        }
         if(Cache::has($cacheKey))
         {
             Cache::forget($cacheKey);
@@ -292,6 +309,11 @@ class UserController extends Controller
         $btnActionCacheKey = $message['chat']['id'].$bot->id.'_bottonAction';
         $cacheKeys = $message['chat']['id'].$bot->id.'_botAlert';
         $bottonArticle = $message['chat']['id'].$bot->id.'_bottonArticle';
+        $cacheKeyCaption = $message['chat']['id'].$bot->id.'_bottonCaption';
+        if(Cache::has($cacheKeyCaption))
+        {
+            Cache::forget($cacheKeyCaption);
+        }
         if(Cache::has($cacheKey))
         {
             Cache::forget($cacheKey);
