@@ -77,8 +77,7 @@ class UserController extends Controller
                     case trans('start.report'):
                         return $this->report($bot,$value['message']);
                     case trans('start.tools'):
-                        return $this->commingSoon($bot,$value['message']);
-                        // return $this->tools($value['message']);
+                         return $this->tools($bot,$value['message']);
                     case trans('start.publicMessage'):
                         return $this->commingSoon($bot,$value['message']);
                         // return $this->publicMessage($value['message']);
@@ -124,7 +123,6 @@ class UserController extends Controller
                         return $this->notFound($bot,$value['message']);
                 }
             }
-
 
             if(Cache::has($value['message']['chat']['id'].$bot->id.'_bottonArticle'))
             {
@@ -410,6 +408,38 @@ class UserController extends Controller
         ]);
     }
 
+
+
+
+
+
+
+    public function tools($bot,$message)
+    {
+        Telegram::sendChatAction([
+            'chat_id' => $message['chat']['id'],
+            'action' => 'typing'
+        ]);
+
+        $keyboard = [
+            [trans('start.requiredJoin')],
+            [trans('start.PreviusBtn')]
+        ];
+
+        $reply_markup = Telegram::replyKeyboardMarkup([
+            'keyboard' => $keyboard,
+            'resize_keyboard' => true,
+            'one_time_keyboard' => false
+        ]);
+
+
+
+        return Telegram::sendMessage([
+            'chat_id' => $message['chat']['id'],
+            'reply_to_message_id' => $message['message_id'],
+            'reply_markup' => $reply_markup
+        ]);
+    }
 
 
 
