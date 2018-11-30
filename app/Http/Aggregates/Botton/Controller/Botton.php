@@ -711,7 +711,7 @@ class BottonController extends Controller
             $response = Telegram::getFile(['file_id' => $photo['file_id']]);
             if(isset($response['file_path']))
             {
-                if (!File::exists(storage_path('files/'.$bot->id.'/photo')))
+                if (!Storage::exists('files/'.$bot->id.'/photo'))
                 {
                     Storage::makeDirectory('files/'.$bot->id.'/photo', 0777, true, true);
                 }
