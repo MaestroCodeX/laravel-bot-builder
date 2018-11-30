@@ -1,5 +1,6 @@
 <?php namespace App\Http\Aggregate\Botton\Repository;
 
+use App\Http\Aggregates\Botton\Model\BotChannel;
 use App\Http\Aggregates\Botton\Model\Botton;
 use App\Http\Aggregates\Botton\Model\BottonData;
 use App\Http\Aggregates\Botton\Contract\BottonContract;
@@ -72,5 +73,23 @@ class BottonRepository implements BottonContract
         return Botton::where('id',$botton_id)->update(['position'=>$position]);
     }
 
+
+    public function createBotChannel($botId,$username)
+    {
+        return BotChannel::updateOrCreate(['bot_id'=> $botId],[
+            'bot_id'=> $botId,
+            'username' => $username
+        ]);
+    }
+
+    public function getChannelBot($botID)
+    {
+        return BotChannel::where('bot_id',$botID)->first();
+    }
+
+    public function deleteChannelBot($botID)
+    {
+        return BotChannel::where('bot_id',$botID)->delete();
+    }
 
 }

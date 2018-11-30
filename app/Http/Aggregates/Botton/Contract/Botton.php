@@ -21,4 +21,8 @@ interface  BottonContract
     public function updatePosition($botton_id,$position);
 
     public function updateFileCaption($fileID,$text);
+
+    public function createBotChannel($botId,$username);
+
+    public function getChannelBot($botID);
 }

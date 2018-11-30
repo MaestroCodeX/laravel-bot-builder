@@ -11,7 +11,7 @@ class Bot extends Eloquent
 
     protected $table = 'bots';
 
-    protected $fillable = ['id','user_id','name','bot_id','username','token','description'];
+    protected $fillable = ['user_id','name','bot_id','username','token','description'];
 
     protected $dates = ['deleted_at'];
 

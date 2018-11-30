@@ -1204,4 +1204,76 @@ class BottonController extends Controller
     }
 
 
+    public function addRequiredJoin($bot,$message)
+    {
+        if(strpos($message['text'],'@') === 0)
+        {
+            $text = $message['text'];
+        }
+        else
+        {
+            $text = '@'.$message['text'];
+        }
+
+        $this->botton->createBotChannel($bot->id,$text);
+
+        $cacheKey = $message['chat']['id'].$bot->id.'_requiredJoinAction';
+        if(Cache::has($cacheKey))
+        {
+            Cache::forget($cacheKey);
+        }
+
+        $keyboard = [
+            [trans('start.inactiveRequiredJoin')],
+            [trans('start.PreviusBtn')]
+        ];
+
+        $reply_markup = Telegram::replyKeyboardMarkup([
+            'keyboard' => $keyboard,
+            'resize_keyboard' => true,
+            'one_time_keyboard' => false
+        ]);
+
+        $html = "
+            <i> عضویت اجباری در کانال شما برای دسترسی به بات فعال شد</i>            
+        ";
+
+        return Telegram::sendMessage([
+            'chat_id' => $message['chat']['id'],
+            'reply_to_message_id' => $message['message_id'],
+            'text' => $html,
+            'parse_mode' => 'HTML',
+            'reply_markup' => $reply_markup
+        ]);
+    }
+
+
+    public function inactiveBotJoin($bot,$message)
+    {
+
+        $this->botton->deleteChannelBot($bot->id);
+        $keyboard = [
+            [trans('start.PreviusBtn')]
+        ];
+
+        $reply_markup = Telegram::replyKeyboardMarkup([
+            'keyboard' => $keyboard,
+            'resize_keyboard' => true,
+            'one_time_keyboard' => false
+        ]);
+
+        $html = "
+            <i> عضوگیری کانال شما غیرفعال شد</i>            
+        ";
+
+        return Telegram::sendMessage([
+            'chat_id' => $message['chat']['id'],
+            'reply_to_message_id' => $message['message_id'],
+            'text' => $html,
+            'parse_mode' => 'HTML',
+            'reply_markup' => $reply_markup
+        ]);
+    }
+
+
 }

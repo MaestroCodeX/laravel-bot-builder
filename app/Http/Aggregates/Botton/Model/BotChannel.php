@@ -5,15 +5,15 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Http\Aggregates\Bot\Model\Bot;
 
 
-class Botton extends Eloquent
+class BotChannel extends Eloquent
 {
     use SoftDeletes;
 
     protected $primaryKey = 'id';
 
-    protected $table = 'bottons';
+    protected $table = 'bot_channel';
 
-    protected $fillable = ['parent_id','name','bot_id','position'];
+    protected $fillable = ['username','bot_id'];
 
     protected $dates = ['deleted_at'];
 
@@ -24,9 +24,5 @@ class Botton extends Eloquent
     }
 
 
-    public function child()
-    {
-        return $this->hasMany(self::class,'parent_id','id');
-    }
    
 }
