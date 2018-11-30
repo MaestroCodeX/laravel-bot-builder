@@ -416,11 +416,6 @@ class UserController extends Controller
 
     public function tools($bot,$message)
     {
-        Telegram::sendChatAction([
-            'chat_id' => $message['chat']['id'],
-            'action' => 'typing'
-        ]);
-
         $keyboard = [
             [trans('start.requiredJoin')],
             [trans('start.PreviusBtn')]
@@ -431,8 +426,6 @@ class UserController extends Controller
             'resize_keyboard' => true,
             'one_time_keyboard' => false
         ]);
-
-
 
         return Telegram::sendMessage([
             'chat_id' => $message['chat']['id'],
