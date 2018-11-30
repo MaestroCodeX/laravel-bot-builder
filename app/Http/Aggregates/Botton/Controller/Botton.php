@@ -1162,4 +1162,40 @@ class BottonController extends Controller
 
 
 
+
+
+    public  function joinBotton($bot,$message)
+    {
+        Telegram::sendChatAction([
+            'chat_id' => $message['chat']['id'],
+            'action' => 'typing'
+        ]);
+
+        $keyboard = [
+            [trans('start.activeJoin')],
+            [trans('start.PreviusBtn')]
+        ];
+
+        $reply_markup = Telegram::replyKeyboardMarkup([
+            'keyboard' => $keyboard,
+            'resize_keyboard' => true,
+            'one_time_keyboard' => false
+        ]);
+
+        $html = "
+            <i> در این بخش میتوانید از طریق بات خود و کانالی که در اختیار دارید اقدام به عضوگیری نمایید</i>
+            
+            <i>ابتدا کانالی که قصد عضوگیری دارید را ساخته و ربات خود را به عنوان ادمین در کانال اضافه کنید و سپس دکمه 'فعال کردن عضوگیری' را در بات بزنید</i>
+        ";
+
+        return Telegram::sendMessage([
+            'chat_id' => $message['chat']['id'],
+            'reply_to_message_id' => $message['message_id'],
+            'text' => $html,
+            'parse_mode' => 'HTML',
+            'reply_markup' => $reply_markup
+        ]);
+    }
+
+
 }
