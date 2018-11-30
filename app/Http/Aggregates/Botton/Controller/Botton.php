@@ -594,15 +594,16 @@ class BottonController extends Controller
                 {
                     File::makeDirectory(storage_path('files'), 0777, true, true);
                 }
+                $uniqid = uniqid("document",true);
                 $uri = "https://api.telegram.org/file/bot".$bot->token."/".$response['file_path'];
-                copy($uri,storage_path('files').'/'.basename($response['file_path']));
+                copy($uri,storage_path('files').'/'.$uniqid.basename($response['file_path']));
 
                 $data = [
                     'type' => 'document',
                     'fileID' => $message['document']['file_id'],
                     'fileSize' => $message['document']['file_size'],
                     'sort' => 'ASC',
-                    'data' => storage_path('files').'/'.basename($response['file_path']),
+                    'data' => storage_path('files').'/'.$uniqid.basename($response['file_path']),
                     'bot_id' => $bot->id,
                     'botton_id' => $cacheGet
                 ];
@@ -639,15 +640,16 @@ class BottonController extends Controller
                 {
                     File::makeDirectory(storage_path('files'), 0777, true, true);
                 }
+                $uniqid = uniqid("document",true);
                 $uri = "https://api.telegram.org/file/bot".$bot->token."/".$response['file_path'];
-                copy($uri,storage_path('files').'/'.basename($response['file_path']));
+                copy($uri,storage_path('files').'/'.$uniqid.basename($response['file_path']));
 
                 $data = [
                     'type' => 'audio',
                     'fileID' => $message['audio']['file_id'],
                     'fileSize' => $message['audio']['file_size'],
                     'sort' => 'ASC',
-                    'data' => storage_path('files').'/'.basename($response['file_path']),
+                    'data' => storage_path('files').'/'.$uniqid.basename($response['file_path']),
                     'bot_id' => $bot->id,
                     'botton_id' => $cacheGet
                 ];
@@ -674,15 +676,16 @@ class BottonController extends Controller
                 {
                     File::makeDirectory(storage_path('files'), 0777, true, true);
                 }
+                $uniqid = uniqid("document",true);
                 $uri = "https://api.telegram.org/file/bot".$bot->token."/".$response['file_path'];
-                copy($uri,storage_path('files').'/'.basename($response['file_path']));
+                copy($uri,storage_path('files').'/'.$uniqid.basename($response['file_path']));
 
                 $data = [
                     'type' => 'video',
                     'fileID' => $message['video']['file_id'],
                     'fileSize' => $message['video']['file_size'],
                     'sort' => 'ASC',
-                    'data' => storage_path('files').'/'.basename($response['file_path']),
+                    'data' => storage_path('files').'/'.$uniqid.basename($response['file_path']),
                     'bot_id' => $bot->id,
                     'botton_id' => $cacheGet
                 ];
@@ -712,15 +715,16 @@ class BottonController extends Controller
                 {
                     File::makeDirectory(storage_path('files'), 0777, true, true);
                 }
+                $uniqid = uniqid("document",true);
                 $uri = "https://api.telegram.org/file/bot".$bot->token."/".$response['file_path'];
-                copy($uri,storage_path('files').'/'.basename($response['file_path']));
+                copy($uri,storage_path('files').'/'.$uniqid.basename($response['file_path']));
 
                 $data = [
                     'type' => 'image',
                     'fileID' => $photo['file_id'],
                     'fileSize' => $photo['file_size'],
                     'sort' => 'ASC',
-                    'data' => storage_path('files').'/'.basename($response['file_path']),
+                    'data' => storage_path('files').'/'.$uniqid.basename($response['file_path']),
                     'bot_id' => $bot->id,
                     'botton_id' => $cacheGet
                 ];
