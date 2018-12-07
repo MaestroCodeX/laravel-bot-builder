@@ -92,4 +92,9 @@ class BottonRepository implements BottonContract
         return BotChannel::where('bot_id',$botID)->delete();
     }
 
+    public  function updateBotChannelText($botId,$text)
+    {
+        return BotChannel::where('bot_id',$botId)->update(['message'=>$text]);
+    }
+
 }

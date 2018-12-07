@@ -24,5 +24,7 @@ interface  BottonContract
 
     public function createBotChannel($botId,$username);
 
+    public  function updateBotChannelText($botId,$text);
+
     public function getChannelBot($botID);
 }

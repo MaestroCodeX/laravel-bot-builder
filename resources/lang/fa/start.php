@@ -36,6 +36,6 @@ return [
 	'ascArticleSort' => 'قدیمی به جدید',
 	'descArticleSort' => 'جدید به قدیم',
     'addCaption' => 'اضافه کردن کپشن',
-    'requiredJoin' => 'عضوگیری',
-    'inactiveRequiredJoin' => 'غیرفعال کردن عضوگیری'
+    'requiredJoin' => 'عضویت اجباری در کانال',
+    'inactiveRequiredJoin' => 'غیرفعال کردن عضویت اجباری'
 ];

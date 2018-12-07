@@ -1180,9 +1180,20 @@ class BottonController extends Controller
             'action' => 'typing'
         ]);
 
-        $keyboard = [
-            [trans('start.PreviusBtn')]
-        ];
+        $channelBot = $this->botton->getChannelBot($bot->id);
+        if(!is_null($channelBot))
+        {
+            $keyboard = [
+                [trans('start.inactiveRequiredJoin')],
+                [trans('start.PreviusBtn')]
+            ];
+        }
+        else
+        {
+            $keyboard = [
+                [trans('start.PreviusBtn')]
+            ];
+        }
 
         $reply_markup = Telegram::replyKeyboardMarkup([
             'keyboard' => $keyboard,
@@ -1191,9 +1202,10 @@ class BottonController extends Controller
         ]);
 
         $html = "
-            <i> در این بخش میتوانید از طریق بات خود و کانالی که در اختیار دارید اقدام به عضوگیری نمایید</i>
+            <i> نام کاربری کانال را ارسال کنید</i>
+            <i>نکته : ابتدا ربات را در کانال مدیر کنید</i>
             
-            <i>ابتدا کانالی که قصد عضوگیری دارید را ساخته و ربات خود را به عنوان ادمین در کانال اضافه کنید و سپس نام کاربری کانال ساخته شده را در این بخش ارسال کنید</i>
+            <i>برای مثال : </i> <a href='@parsbehcombot'>@parsbehcombot</a> 
         ";
 
         return Telegram::sendMessage([
@@ -1231,8 +1243,14 @@ class BottonController extends Controller
                 Cache::forget($cacheKey);
             }
 
+            $cacheKey = $message['chat']['id'].$bot->id.'_requiredJoinTextWarning';
+            if(Cache::has($cacheKey))
+            {
+                Cache::forget($cacheKey);
+            }
+            Cache::put($cacheKey,$text, 40320);
+
             $keyboard = [
-                [trans('start.inactiveRequiredJoin')],
                 [trans('start.PreviusBtn')]
             ];
 
@@ -1243,8 +1261,13 @@ class BottonController extends Controller
             ]);
 
             $html = "
-            <i> عضویت اجباری در کانال شما برای دسترسی به بات فعال شد</i>            
-        ";
+                <i> حالا متنی که هنگام عضو نبودن کاربر نمایش داده می شود را ارسال کنید</i>       
+                
+                <i>مثال:</i>     
+                <i>لطفا در کانال</i> <a href='@parsbehcom'>@parsbehcom</a> <i>عضو شوید تا ربات برای شما فعال شود</i>
+                
+                <i>Parse Mode = HTML</i>
+           ";
 
             return Telegram::sendMessage([
                 'chat_id' => $message['chat']['id'],
@@ -1281,6 +1304,44 @@ class BottonController extends Controller
     }
 
 
+
+
+
+    public function addRequiredJoinwarningText($bot,$message)
+    {
+        $this->botton->updateBotChannelText($bot->id,$message['text']);
+
+        $cacheKey = $message['chat']['id'].$bot->id.'_requiredJoinTextWarning';
+        if(Cache::has($cacheKey))
+        {
+            Cache::forget($cacheKey);
+        }
+
+        $keyboard = [
+            [trans('start.PreviusBtn')]
+        ];
+
+        $reply_markup = Telegram::replyKeyboardMarkup([
+            'keyboard' => $keyboard,
+            'resize_keyboard' => true,
+            'one_time_keyboard' => false
+        ]);
+
+        $html = "
+                <i> با موفقیت ثبت شد</i>            
+            ";
+
+        return Telegram::sendMessage([
+            'chat_id' => $message['chat']['id'],
+            'reply_to_message_id' => $message['message_id'],
+            'text' => $html,
+            'parse_mode' => 'HTML',
+            'reply_markup' => $reply_markup
+        ]);
+    }
+
+
+
     public function inactiveBotJoin($bot,$message)
     {
         $this->botton->deleteChannelBot($bot->id);
@@ -1295,7 +1356,7 @@ class BottonController extends Controller
         ]);
 
         $html = "
-            <i> عضوگیری کانال شما غیرفعال شد</i>            
+            <i> عضویت اجباری در کانال با موفقیت غیرفعال شد</i>            
         ";
 
         return Telegram::sendMessage([
