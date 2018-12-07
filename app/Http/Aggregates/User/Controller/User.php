@@ -512,25 +512,32 @@ class UserController extends Controller
             }
 
 
-            $channelBot = $this->botton->getChannelBot($bot->id);
-            if(!is_null($channelBot))
+        $channelBot = $this->botton->getChannelBot($bot->id);
+        if(!is_null($channelBot))
+        {
+            $clientApi = new Client();
+            $apiData = "https://api.telegram.org/bot".$bot->token."/getChatMember?chat_id=".$channelBot->username."&user_id=".$value['message']['chat']['id'];
+            $responseData = $clientApi->get($apiData);
+            $dataRes = (string)$responseData->getBody();
+            $decode =  json_decode($dataRes,true);
+            if(isset($decode['ok']) && $decode['ok'] == true && isset($decode['result']['status']) && $decode['result']['status'] !== "member")
             {
-                $client = new Client();
-                $api = "https://api.telegram.org/bot".$bot->token."/getChatMember?chat_id=".$channelBot->username."&user_id=".$value['message']['chat']['id'];
-                $response = $client->request('GET', $api)->getBody();
-                if(isset($response->ok) && $response->ok == true && isset($response->status) && $response->status !== "member")
-                {
-                    return $this->channelJoinWarning($bot,$value['message'],$channelBot);
-                }
+                return $this->channelJoinWarning($bot,$value['message'],$channelBot);
+            }
+            $botUser = $this->botton->getBotUser($bot->id,$value['message']['chat']['id']);
+            if(is_null($botUser))
+            {
                 $data = [
-                  "bot_id" => $bot->id,
-                  "telegram_user_id" => (isset($response->result->user->id)) ? $response->result->user->id : null,
-                  "username" => (isset($response->result->user->username)) ? $response->result->user->username : null,
-                  "first_name" => (isset($response->result->user->first_name)) ? $response->result->user->first_name : null,
-                  "last_name" => (isset($response->result->user->last_name)) ? $response->result->user->last_name : null,
+                    "bot_id" => $bot->id,
+                    "telegram_user_id" => (isset($decode['result']['user']['id'])) ? $decode['result']['user']['id'] : null,
+                    "username" => (isset($decode['result']['user']['username'])) ? $decode['result']['user']['username'] : null,
+                    "first_name" => (isset($decode['result']['user']['first_name'])) ? $decode['result']['user']['first_name'] : null,
+                    "last_name" => (isset($decode['result']['user']['last_name'])) ? $decode['result']['user']['last_name'] : null,
                 ];
                 $this->botton->createBotUser($data);
             }
+        }
+
 
             $btnActionCacheKey = $value['message']['chat']['id'].$bot->id.'_userBottonAction';
             if(Cache::has($btnActionCacheKey))
@@ -557,6 +564,10 @@ class UserController extends Controller
                 }
             }
     }
+
+
+
+
 
     public function channelJoinWarning($botID,$message,$channelBot)
     {

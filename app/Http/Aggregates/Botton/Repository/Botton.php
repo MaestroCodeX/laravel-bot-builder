@@ -1,8 +1,6 @@
 <?php namespace App\Http\Aggregate\Botton\Repository;
 
-use App\Http\Aggregates\Botton\Model\BotChannel;
-use App\Http\Aggregates\Botton\Model\Botton;
-use App\Http\Aggregates\Botton\Model\BottonData;
+use App\Http\Aggregates\Botton\Model\{BotUser,Botton,BotChannel,BottonData};
 use App\Http\Aggregates\Botton\Contract\BottonContract;
 
 class BottonRepository implements BottonContract
@@ -97,4 +95,13 @@ class BottonRepository implements BottonContract
         return BotChannel::where('bot_id',$botId)->update(['message'=>$text]);
     }
 
+    public function createBotUser($data)
+    {
+        return BotUser::create($data);
+    }
+
+    public function getBotUser($bot_id,$user_id)
+    {
+        return BotUser::where('bot_id',$bot_id)->where('telegram_user_id',$user_id)->first();
+    }
 }
