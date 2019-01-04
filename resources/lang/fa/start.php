@@ -37,5 +37,9 @@ return [
 	'descArticleSort' => 'جدید به قدیم',
     'addCaption' => 'اضافه کردن کپشن',
     'requiredJoin' => 'عضویت اجباری در کانال',
-    'inactiveRequiredJoin' => 'غیرفعال کردن عضویت اجباری'
+    'inactiveRequiredJoin' => 'غیرفعال کردن عضویت اجباری',
+    'numberFaq' => 'عددی',
+    'textFaq' => 'متنی',
+    'phoneFaq' => 'شماره تماس',
+    'finishFaq' => 'اتمام'
 ];

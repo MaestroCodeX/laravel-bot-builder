@@ -1,6 +1,6 @@
 <?php namespace App\Http\Aggregate\Botton\Repository;
 
-use App\Http\Aggregates\Botton\Model\{BotUser,Botton,BotChannel,BottonData};
+use App\Http\Aggregates\Botton\Model\{BotFAQ, BotUser, Botton, BotChannel, BottonData};
 use App\Http\Aggregates\Botton\Contract\BottonContract;
 
 class BottonRepository implements BottonContract
@@ -103,5 +103,15 @@ class BottonRepository implements BottonContract
     public function getBotUser($bot_id,$user_id)
     {
         return BotUser::where('bot_id',$bot_id)->where('telegram_user_id',$user_id)->first();
+    }
+
+    public function createFaq($data)
+    {
+        return BotFAQ::create($data);
+    }
+
+    public function updateQuestion($botID,$question,$type)
+    {
+        return BotFAQ::where('bot_id',$botID)->where('id',$question)->update(['answer_type'=>$type]);
     }
 }

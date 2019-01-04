@@ -1,14 +1,10 @@
 <?php   namespace App\Http\Aggregates\User\Controller;
 
 use Telegram;
-use Telegram\Bot\Api;
 use GuzzleHttp\Client;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Crypt;
-use App\Http\Aggregates\Bot\Controller\BotController;
 use App\Http\Aggregates\Bot\Contract\BotContract as Bot;
-use App\Http\Aggregates\Start\Controller\StartController;
 use App\Http\Aggregates\Botton\Controller\BottonController;
 use App\Http\Aggregates\User\Contract\UserContract as User;
 use App\Http\Aggregates\Botton\Contract\BottonContract as Botton;
@@ -122,7 +118,17 @@ class UserController extends Controller
                     case Cache::has($value['message']['chat']['id'].$bot->id.'_bottonArticle'):
                         return app(BottonController::class)->getArticle‌Botton($bot,$value['message']);
                     case trans('start.createFaq'):
-                        return $this->commingSoon($bot,$value['message']);
+                        return app(BottonController::class)->createFaq($bot,$value['message']);
+                    case trans('start.numberFaq'):
+                        return app(BottonController::class)->addAnswerType($bot,$value['message'],"number");
+                    case trans('start.finishFaq'):
+                        return app(BottonController::class)->finishFaq($bot,$value['message']);
+                    case trans('start.textFaq'):
+                        return app(BottonController::class)->addAnswerType($bot,$value['message'],"text");
+                    case trans('start.phoneFaq'):
+                        return app(BottonController::class)->addAnswerType($bot,$value['message'],"phone");
+                    case Cache::has($value['message']['chat']['id'].$bot->id.'_createFaq'):
+                        return app(BottonController::class)->addFaq($bot,$value['message']);
                     case !is_null($botton):
                         return app(BottonController::class)->bottonActions($bot,$value['message'],$botton);
                     default:
@@ -144,16 +150,26 @@ class UserController extends Controller
             'chat_id' => $message['chat']['id'],
             'action' => 'typing'
         ]);
-        $cacheKey = $message['chat']['id'].$bot->id.'_bottonName';
+        $bcacheKey = $message['chat']['id'].$bot->id.'_bottonName';
         $btnActionCacheKey = $message['chat']['id'].$bot->id.'_bottonAction';
         $cacheKeys = $message['chat']['id'].$bot->id.'_botAlert';
         $bottonArticle = $message['chat']['id'].$bot->id.'_bottonArticle';
         $cacheKeyCaption = $message['chat']['id'].$bot->id.'_bottonCaption';
         $cacheKeyJoin = $message['chat']['id'].$bot->id.'_requiredJoinAction';
         $cacheKey = $message['chat']['id'].$bot->id.'_requiredJoinTextWarning';
-        if(Cache::has($cacheKey))
+        $faqKey = $message['chat']['id'].$bot->id.'_createFaq';
+        $questionKey = $message['chat']['id'].$bot->id.'_answerType';
+        if(Cache::has($questionKey))
         {
-            Cache::forget($cacheKey);
+            Cache::forget($questionKey);
+        }
+        if(Cache::has($faqKey))
+        {
+            Cache::forget($faqKey);
+        }
+        if(Cache::has($bcacheKey))
+        {
+            Cache::forget($bcacheKey);
         }
         if(Cache::has($cacheKeyJoin))
         {
@@ -211,16 +227,26 @@ class UserController extends Controller
             'chat_id' => $message['chat']['id'],
             'action' => 'typing'
         ]);
-        $cacheKey = $message['chat']['id'].$bot->id.'_bottonName';
+        $bcacheKey = $message['chat']['id'].$bot->id.'_bottonName';
         $btnActionCacheKey = $message['chat']['id'].$bot->id.'_bottonAction';
         $cacheKeys = $message['chat']['id'].$bot->id.'_botAlert';
         $bottonArticle = $message['chat']['id'].$bot->id.'_bottonArticle';
         $cacheKeyCaption = $message['chat']['id'].$bot->id.'_bottonCaption';
         $cacheKeyJoin = $message['chat']['id'].$bot->id.'_requiredJoinAction';
         $cacheKey = $message['chat']['id'].$bot->id.'_requiredJoinTextWarning';
-        if(Cache::has($cacheKey))
+        $faqKey = $message['chat']['id'].$bot->id.'_createFaq';
+        $questionKey = $message['chat']['id'].$bot->id.'_answerType';
+        if(Cache::has($questionKey))
         {
-            Cache::forget($cacheKey);
+            Cache::forget($questionKey);
+        }
+        if(Cache::has($faqKey))
+        {
+            Cache::forget($faqKey);
+        }
+        if(Cache::has($bcacheKey))
+        {
+            Cache::forget($bcacheKey);
         }
         if(Cache::has($cacheKeyJoin))
         {
@@ -281,16 +307,26 @@ class UserController extends Controller
             'chat_id' => $message['chat']['id'],
             'action' => 'typing'
         ]);
-        $cacheKey = $message['chat']['id'].$bot->id.'_bottonName';
+        $bcacheKey = $message['chat']['id'].$bot->id.'_bottonName';
         $btnActionCacheKey = $message['chat']['id'].$bot->id.'_bottonAction';
         $cacheKeys = $message['chat']['id'].$bot->id.'_botAlert';
         $bottonArticle = $message['chat']['id'].$bot->id.'_bottonArticle';
         $cacheKeyCaption = $message['chat']['id'].$bot->id.'_bottonCaption';
         $cacheKeyJoin = $message['chat']['id'].$bot->id.'_requiredJoinAction';
         $cacheKey = $message['chat']['id'].$bot->id.'_requiredJoinTextWarning';
-        if(Cache::has($cacheKey))
+        $faqKey = $message['chat']['id'].$bot->id.'_createFaq';
+        $questionKey = $message['chat']['id'].$bot->id.'_answerType';
+        if(Cache::has($questionKey))
         {
-            Cache::forget($cacheKey);
+            Cache::forget($questionKey);
+        }
+        if(Cache::has($faqKey))
+        {
+            Cache::forget($faqKey);
+        }
+        if(Cache::has($bcacheKey))
+        {
+            Cache::forget($bcacheKey);
         }
         if(Cache::has($cacheKeyJoin))
         {
@@ -341,16 +377,26 @@ class UserController extends Controller
             'chat_id' => $message['chat']['id'],
             'action' => 'typing'
         ]);
-        $cacheKey = $message['chat']['id'].$bot->id.'_bottonName';
+        $bcacheKey = $message['chat']['id'].$bot->id.'_bottonName';
         $btnActionCacheKey = $message['chat']['id'].$bot->id.'_bottonAction';
         $cacheKeys = $message['chat']['id'].$bot->id.'_botAlert';
         $bottonArticle = $message['chat']['id'].$bot->id.'_bottonArticle';
         $cacheKeyCaption = $message['chat']['id'].$bot->id.'_bottonCaption';
         $cacheKeyJoin = $message['chat']['id'].$bot->id.'_requiredJoinAction';
         $cacheKey = $message['chat']['id'].$bot->id.'_requiredJoinTextWarning';
-        if(Cache::has($cacheKey))
+        $faqKey = $message['chat']['id'].$bot->id.'_createFaq';
+        $questionKey = $message['chat']['id'].$bot->id.'_answerType';
+        if(Cache::has($questionKey))
         {
-            Cache::forget($cacheKey);
+            Cache::forget($questionKey);
+        }
+        if(Cache::has($faqKey))
+        {
+            Cache::forget($faqKey);
+        }
+        if(Cache::has($bcacheKey))
+        {
+            Cache::forget($bcacheKey);
         }
         if(Cache::has($cacheKeyJoin))
         {

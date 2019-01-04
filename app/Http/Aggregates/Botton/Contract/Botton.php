@@ -31,4 +31,8 @@ interface  BottonContract
     public function createBotUser($data);
 
     public function getBotUser($bot_id,$user_id);
+
+    public function createFaq($data);
+
+    public function updateQuestion($botID,$question,$type);
 }

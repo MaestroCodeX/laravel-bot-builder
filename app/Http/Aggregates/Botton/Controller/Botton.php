@@ -3,12 +3,9 @@
 use File;
 use GuzzleHttp\Client;
 use Telegram;
-use Telegram\Bot\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Cache;
-use App\Http\Aggregates\User\Controller\UserController;
 use App\Http\Aggregates\User\Contract\UserContract as User;
-use App\Http\Aggregates\AdminBot\Controller\AdminBotController;
 use App\Http\Aggregates\Botton\Contract\BottonContract as Botton;
 use Exception;
 
@@ -1367,6 +1364,168 @@ class BottonController extends Controller
             'reply_markup' => $reply_markup
         ]);
     }
+
+
+
+
+    public function createFaq($bot,$message)
+    {
+        $faqKey = $message['chat']['id'].$bot->id.'_createFaq';
+        if(Cache::has($faqKey))
+        {
+            Cache::forget($faqKey);
+        }
+        Cache::put($faqKey,$bot->id, 40320);
+
+        $keyboard = [
+            [trans('start.PreviusBtn')]
+        ];
+
+        $reply_markup = Telegram::replyKeyboardMarkup([
+            'keyboard' => $keyboard,
+            'resize_keyboard' => true,
+            'one_time_keyboard' => false
+        ]);
+
+        $html = "
+            <i> توسط این قابلیت شما میتوانید فرمی از سوالات طراحی کنید که کاربر به آن ها پاسخ دهد و برای شما ارسال شود</i>     
+            <i>پس از پاسخ به هر سوال , سوال بعدی برای کاربر ارسال می شود و پس از اتمام سوالات, لیست سوال و جواب ها برای شما ارسال می شود</i>  
+            
+            
+            <i>خب متن اولین سوال را ارسال کنید</i>     
+        ";
+
+        return Telegram::sendMessage([
+            'chat_id' => $message['chat']['id'],
+            'reply_to_message_id' => $message['message_id'],
+            'text' => $html,
+            'parse_mode' => 'HTML',
+            'reply_markup' => $reply_markup
+        ]);
+    }
+
+
+    public function addFaq($bot,$message)
+    {
+        $data = [
+          "bot_id" => $bot->id,
+          "question" => $message["text"]
+        ];
+        $question_id = $this->botton->createFaq($data);
+
+        $questionKey = $message['chat']['id'].$bot->id.'_answerType';
+        if(Cache::has($questionKey))
+        {
+            Cache::forget($questionKey);
+        }
+        Cache::put($questionKey,$question_id->id, 40320);
+
+        $keyboard = [
+            [trans('start.numberFaq'), trans('start.textFaq')],
+            [trans('start.phoneFaq')],
+            [trans('start.PreviusBtn')]
+        ];
+
+        $reply_markup = Telegram::replyKeyboardMarkup([
+            'keyboard' => $keyboard,
+            'resize_keyboard' => true,
+            'one_time_keyboard' => false
+        ]);
+
+        $html = "
+           <i>پاسخ دریافتی از کاربر برای این سوال از چه نوع باشد؟</i>
+        ";
+
+        return Telegram::sendMessage([
+            'chat_id' => $message['chat']['id'],
+            'reply_to_message_id' => $message['message_id'],
+            'text' => $html,
+            'parse_mode' => 'HTML',
+            'reply_markup' => $reply_markup
+        ]);
+    }
+
+
+    public function addAnswerType($bot, $message, $type)
+    {
+        $questionKey = $message['chat']['id'].$bot->id.'_answerType';
+        $question = null;
+        if(Cache::has($questionKey))
+        {
+           $question =  Cache::get($questionKey);
+        }
+        $this->botton->updateQuestion($bot->id,$question,$type);
+
+        Cache::forget($questionKey);
+
+        $keyboard = [
+            [trans('start.finishFaq')],
+            [trans('start.PreviusBtn')]
+        ];
+
+        $reply_markup = Telegram::replyKeyboardMarkup([
+            'keyboard' => $keyboard,
+            'resize_keyboard' => true,
+            'one_time_keyboard' => false
+        ]);
+
+        $html = "
+                    <i>این سوال با موفقیت اضافه شد</i>
+                    <i>سوال بعدی را ارسال کنید</i>
+        
+        
+                    <i>برای پایان طرح سوال از دکمه 'اتمام' استفاده کنید</i>
+                ";
+
+        return Telegram::sendMessage([
+            'chat_id' => $message['chat']['id'],
+            'reply_to_message_id' => $message['message_id'],
+            'text' => $html,
+            'parse_mode' => 'HTML',
+            'reply_markup' => $reply_markup
+        ]);
+    }
+
+
+    public function finishFaq($bot, $message)
+    {
+        $faqKey = $message['chat']['id'].$bot->id.'_createFaq';
+        $questionKey = $message['chat']['id'].$bot->id.'_answerType';
+        if(Cache::has($faqKey))
+        {
+            Cache::forget($faqKey);
+        }
+        if(Cache::has($questionKey))
+        {
+            Cache::forget($questionKey);
+        }
+
+
+        $keyboard = [
+            [trans('start.PreviusBtn')]
+        ];
+
+        $reply_markup = Telegram::replyKeyboardMarkup([
+            'keyboard' => $keyboard,
+            'resize_keyboard' => true,
+            'one_time_keyboard' => false
+        ]);
+
+        $html = "
+                    <i>سوالات با موفقیت اضافه شد</i>
+                ";
+
+        return Telegram::sendMessage([
+            'chat_id' => $message['chat']['id'],
+            'reply_to_message_id' => $message['message_id'],
+            'text' => $html,
+            'parse_mode' => 'HTML',
+            'reply_markup' => $reply_markup
+        ]);
+    }
+
+
+
 
 
 }
