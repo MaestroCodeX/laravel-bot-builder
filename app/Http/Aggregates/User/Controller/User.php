@@ -127,6 +127,8 @@ class UserController extends Controller
                         return app(BottonController::class)->addAnswerType($bot,$value['message'],"text");
                     case trans('start.phoneFaq'):
                         return app(BottonController::class)->addAnswerType($bot,$value['message'],"phone");
+                    case Cache::has($value['message']['chat']['id'].$bot->id.'_nameForFaq'):
+                        return app(BottonController::class)->setFaqName($bot,$value['message']);
                     case Cache::has($value['message']['chat']['id'].$bot->id.'_createFaq'):
                         return app(BottonController::class)->addFaq($bot,$value['message']);
                     case !is_null($botton):
@@ -159,6 +161,11 @@ class UserController extends Controller
         $cacheKey = $message['chat']['id'].$bot->id.'_requiredJoinTextWarning';
         $faqKey = $message['chat']['id'].$bot->id.'_createFaq';
         $questionKey = $message['chat']['id'].$bot->id.'_answerType';
+        $questionNameKey = $message['chat']['id'].$bot->id.'_nameForFaq';
+        if(Cache::has($questionNameKey))
+        {
+            Cache::forget($questionNameKey);
+        }
         if(Cache::has($questionKey))
         {
             Cache::forget($questionKey);
@@ -236,6 +243,11 @@ class UserController extends Controller
         $cacheKey = $message['chat']['id'].$bot->id.'_requiredJoinTextWarning';
         $faqKey = $message['chat']['id'].$bot->id.'_createFaq';
         $questionKey = $message['chat']['id'].$bot->id.'_answerType';
+        $questionNameKey = $message['chat']['id'].$bot->id.'_nameForFaq';
+        if(Cache::has($questionNameKey))
+        {
+            Cache::forget($questionNameKey);
+        }
         if(Cache::has($questionKey))
         {
             Cache::forget($questionKey);
@@ -316,6 +328,11 @@ class UserController extends Controller
         $cacheKey = $message['chat']['id'].$bot->id.'_requiredJoinTextWarning';
         $faqKey = $message['chat']['id'].$bot->id.'_createFaq';
         $questionKey = $message['chat']['id'].$bot->id.'_answerType';
+        $questionNameKey = $message['chat']['id'].$bot->id.'_nameForFaq';
+        if(Cache::has($questionNameKey))
+        {
+            Cache::forget($questionNameKey);
+        }
         if(Cache::has($questionKey))
         {
             Cache::forget($questionKey);
@@ -386,6 +403,11 @@ class UserController extends Controller
         $cacheKey = $message['chat']['id'].$bot->id.'_requiredJoinTextWarning';
         $faqKey = $message['chat']['id'].$bot->id.'_createFaq';
         $questionKey = $message['chat']['id'].$bot->id.'_answerType';
+        $questionNameKey = $message['chat']['id'].$bot->id.'_nameForFaq';
+        if(Cache::has($questionNameKey))
+        {
+            Cache::forget($questionNameKey);
+        }
         if(Cache::has($questionKey))
         {
             Cache::forget($questionKey);

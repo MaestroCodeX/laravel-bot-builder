@@ -19,6 +19,7 @@ class Faq extends Migration
             $table->increments('id');
             $table->string('question',1000);
             $table->string('answer_type',100);
+            $table->string('name',100)->nullable();
             $table->unsignedInteger('bot_id');
             $table->foreign('bot_id')->references('id')->on('bots');
             $table->timestamps();

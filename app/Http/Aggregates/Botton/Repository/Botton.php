@@ -114,4 +114,10 @@ class BottonRepository implements BottonContract
     {
         return BotFAQ::where('bot_id',$botID)->where('id',$question)->update(['answer_type'=>$type]);
     }
+
+    public function updateQuestionName($botID,$text)
+    {
+        return BotFAQ::where('bot_id',$botID)->update(['name'=>$text]);
+    }
+
 }

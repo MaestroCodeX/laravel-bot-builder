@@ -41,5 +41,5 @@ return [
     'numberFaq' => 'عددی',
     'textFaq' => 'متنی',
     'phoneFaq' => 'شماره تماس',
-    'finishFaq' => 'اتمام'
+    'finishFaq' => 'اتمام سوالات'
 ];

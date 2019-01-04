@@ -1500,6 +1500,12 @@ class BottonController extends Controller
             Cache::forget($questionKey);
         }
 
+        $questionNameKey = $message['chat']['id'].$bot->id.'_nameForFaq';
+        if(Cache::has($questionNameKey))
+        {
+            Cache::forget($questionNameKey);
+        }
+        Cache::put($questionNameKey,$bot->id, 40320);
 
         $keyboard = [
             [trans('start.PreviusBtn')]
@@ -1512,7 +1518,7 @@ class BottonController extends Controller
         ]);
 
         $html = "
-                    <i>سوالات با موفقیت اضافه شد</i>
+                    <i>خب یک نام برای این فرم سوال انتخاب کنید</i>
                 ";
 
         return Telegram::sendMessage([
@@ -1524,6 +1530,43 @@ class BottonController extends Controller
         ]);
     }
 
+
+
+    public function setFaqName($bot, $message)
+    {
+        $questionNameKey = $message['chat']['id'].$bot->id.'_nameForFaq';
+        if(Cache::has($questionNameKey))
+        {
+            Cache::forget($questionNameKey);
+        }
+
+        $this->botton->updateQuestionName($bot->id,$message["text"]);
+
+
+        $keyboard = [
+            [trans('start.PreviusBtn')]
+        ];
+
+        $reply_markup = Telegram::replyKeyboardMarkup([
+            'keyboard' => $keyboard,
+            'resize_keyboard' => true,
+            'one_time_keyboard' => false
+        ]);
+
+        $html = "
+                    <i>سوالات با موفقیت ثبت شد</i>
+                    
+                    <i>برای مدیریت پاسخ سوالات از دکمه 'مدیریت پاسخ فعلی' استفاده کنید</i>
+                ";
+
+        return Telegram::sendMessage([
+            'chat_id' => $message['chat']['id'],
+            'reply_to_message_id' => $message['message_id'],
+            'text' => $html,
+            'parse_mode' => 'HTML',
+            'reply_markup' => $reply_markup
+        ]);
+    }
 
 
 
