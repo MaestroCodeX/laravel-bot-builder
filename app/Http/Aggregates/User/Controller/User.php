@@ -127,6 +127,10 @@ class UserController extends Controller
                         return app(BottonController::class)->addAnswerType($bot,$value['message'],"text");
                     case trans('start.phoneFaq'):
                         return app(BottonController::class)->addAnswerType($bot,$value['message'],"phone");
+                    case trans('start.addAdditionalFaq'):
+                        return app(BottonController::class)->addAdditionalFaq($bot,$value['message']);
+                    case trans('start.addNewFaq'):
+                        return app(BottonController::class)->addNewFaq($bot,$value['message']);
                     case Cache::has($value['message']['chat']['id'].$bot->id.'_nameForFaq'):
                         return app(BottonController::class)->setFaqName($bot,$value['message']);
                     case Cache::has($value['message']['chat']['id'].$bot->id.'_createFaq'):

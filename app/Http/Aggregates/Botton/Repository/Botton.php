@@ -110,14 +110,24 @@ class BottonRepository implements BottonContract
         return BotFAQ::create($data);
     }
 
-    public function updateQuestion($botID,$question,$type)
+    public function updateQuestion($botID,$question,$type,$bottonID)
     {
-        return BotFAQ::where('bot_id',$botID)->where('id',$question)->update(['answer_type'=>$type]);
+        return BotFAQ::where('bot_id',$botID)->where('botton_id',$bottonID)->where('id',$question)->update(['answer_type'=>$type]);
     }
 
-    public function updateQuestionName($botID,$text)
+    public function updateQuestionName($botID,$text,$bottonID)
     {
-        return BotFAQ::where('bot_id',$botID)->update(['name'=>$text]);
+        return BotFAQ::where('bot_id',$botID)->where('botton_id',$bottonID)->update(['name'=>$text]);
+    }
+
+    public function listOfFAQ($botID,$bottonID)
+    {
+        return BotFAQ::where('bot_id',$botID)->where('botton_id',$bottonID)->get();
+    }
+
+    public function deleteAllFAQ($botID,$bottonID)
+    {
+        return BotFAQ::where('bot_id',$botID)->where('botton_id',$bottonID)->forcedelete();
     }
 
 }

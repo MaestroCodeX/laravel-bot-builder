@@ -1370,30 +1370,59 @@ class BottonController extends Controller
 
     public function createFaq($bot,$message)
     {
-        $faqKey = $message['chat']['id'].$bot->id.'_createFaq';
-        if(Cache::has($faqKey))
+        $btnActionCacheKey = $message['chat']['id'].$bot->id.'_bottonAction';
+        if(Cache::has($btnActionCacheKey))
         {
-            Cache::forget($faqKey);
+            $cacheGet = Cache::get($btnActionCacheKey);
+            $botton = json_decode($cacheGet);
         }
-        Cache::put($faqKey,$bot->id, 40320);
+        $bottonId = (isset($botton) && !empty($botton)) ? $botton[0] : null;
 
-        $keyboard = [
-            [trans('start.PreviusBtn')]
-        ];
+        $faqs = $this->botton->listOfFAQ($bot->id,$bottonId);
+        $countOfFAQ = (isset($faqs) && !empty($faqs)) ? count($faqs) : 0;
+
+        if(!empty($faqs) && $countOfFAQ > 0)
+        {
+            $nameOfFaq = (isset($faqs[0]["name"]) && !empty($faqs[0]["name"])) ? $faqs[0]["name"] : "";
+            $html = "
+                <i>نام فرم سوال فعلی : ".$nameOfFaq."</i>
+                <i>تعداد ".$countOfFAQ." سوال برای این دکمه ذخیره شده است برای ویرایش از دکمه مدیریت پاسخ فعلی استفاده کنید </i>
+                <i>در غیر این صورت از 'اضافه کردن سوال' برای افزودن سوالات بیشتر و از 'ثبت سوالات جدید' برای پاک کردن سوالات ثبت شده استفاده کنید</i>
+            ";
+
+            $keyboard = [
+                [trans('start.addAdditionalFaq')],
+                [trans('start.addNewFaq')],
+                [trans('start.PreviusBtn')]
+            ];
+        }
+        else
+        {
+            $faqKey = $message['chat']['id'].$bot->id.'_createFaq';
+            if(Cache::has($faqKey))
+            {
+                Cache::forget($faqKey);
+            }
+            Cache::put($faqKey,$bot->id, 40320);
+
+            $html = "
+                <i> توسط این قابلیت شما میتوانید فرمی از سوالات طراحی کنید که کاربر به آن ها پاسخ دهد و برای شما ارسال شود</i>     
+                <i>پس از پاسخ به هر سوال , سوال بعدی برای کاربر ارسال می شود و پس از اتمام سوالات, لیست سوال و جواب ها برای شما ارسال می شود</i>  
+                
+                
+                <i>خب متن اولین سوال را ارسال کنید</i>     
+             ";
+
+            $keyboard = [
+                [trans('start.PreviusBtn')]
+            ];
+        }
 
         $reply_markup = Telegram::replyKeyboardMarkup([
             'keyboard' => $keyboard,
             'resize_keyboard' => true,
             'one_time_keyboard' => false
         ]);
-
-        $html = "
-            <i> توسط این قابلیت شما میتوانید فرمی از سوالات طراحی کنید که کاربر به آن ها پاسخ دهد و برای شما ارسال شود</i>     
-            <i>پس از پاسخ به هر سوال , سوال بعدی برای کاربر ارسال می شود و پس از اتمام سوالات, لیست سوال و جواب ها برای شما ارسال می شود</i>  
-            
-            
-            <i>خب متن اولین سوال را ارسال کنید</i>     
-        ";
 
         return Telegram::sendMessage([
             'chat_id' => $message['chat']['id'],
@@ -1407,9 +1436,18 @@ class BottonController extends Controller
 
     public function addFaq($bot,$message)
     {
+        $btnActionCacheKey = $message['chat']['id'].$bot->id.'_bottonAction';
+        if(Cache::has($btnActionCacheKey))
+        {
+            $cacheGet = Cache::get($btnActionCacheKey);
+            $botton = json_decode($cacheGet);
+        }
+        $bottonId = (isset($botton) && !empty($botton)) ? $botton[0] : null;
+
         $data = [
-          "bot_id" => $bot->id,
-          "question" => $message["text"]
+            "bot_id" => $bot->id,
+            "botton_id" => $bottonId,
+            "question" => $message["text"]
         ];
         $question_id = $this->botton->createFaq($data);
 
@@ -1448,13 +1486,22 @@ class BottonController extends Controller
 
     public function addAnswerType($bot, $message, $type)
     {
+        $btnActionCacheKey = $message['chat']['id'].$bot->id.'_bottonAction';
+        if(Cache::has($btnActionCacheKey))
+        {
+            $cacheGet = Cache::get($btnActionCacheKey);
+            $botton = json_decode($cacheGet);
+        }
+        $bottonId = (isset($botton) && !empty($botton)) ? $botton[0] : null;
+
+
         $questionKey = $message['chat']['id'].$bot->id.'_answerType';
         $question = null;
         if(Cache::has($questionKey))
         {
            $question =  Cache::get($questionKey);
         }
-        $this->botton->updateQuestion($bot->id,$question,$type);
+        $this->botton->updateQuestion($bot->id,$question,$type,$bottonId);
 
         Cache::forget($questionKey);
 
@@ -1489,6 +1536,15 @@ class BottonController extends Controller
 
     public function finishFaq($bot, $message)
     {
+        $btnActionCacheKey = $message['chat']['id'].$bot->id.'_bottonAction';
+        if(Cache::has($btnActionCacheKey))
+        {
+            $cacheGet = Cache::get($btnActionCacheKey);
+            $botton = json_decode($cacheGet);
+        }
+        $bottonId = (isset($botton) && !empty($botton)) ? $botton[0] : null;
+
+
         $faqKey = $message['chat']['id'].$bot->id.'_createFaq';
         $questionKey = $message['chat']['id'].$bot->id.'_answerType';
         if(Cache::has($faqKey))
@@ -1498,6 +1554,14 @@ class BottonController extends Controller
         if(Cache::has($questionKey))
         {
             Cache::forget($questionKey);
+        }
+
+        $faqs = $this->botton->listOfFAQ($bot->id,$bottonId);
+        $countOfFAQ = (isset($faqs) && !empty($faqs)) ? count($faqs) : 0;
+        $nameOfFaq = (isset($faqs[0]["name"]) && !empty($faqs[0]["name"])) ? $faqs[0]["name"] : "";
+        if(!empty($faqs) && $countOfFAQ > 0 && !empty($nameOfFaq))
+        {
+            return $this->setFaqName($bot, $message);
         }
 
         $questionNameKey = $message['chat']['id'].$bot->id.'_nameForFaq';
@@ -1534,14 +1598,29 @@ class BottonController extends Controller
 
     public function setFaqName($bot, $message)
     {
+        $btnActionCacheKey = $message['chat']['id'].$bot->id.'_bottonAction';
+        if(Cache::has($btnActionCacheKey))
+        {
+            $cacheGet = Cache::get($btnActionCacheKey);
+            $botton = json_decode($cacheGet);
+        }
+        $bottonId = (isset($botton) && !empty($botton)) ? $botton[0] : null;
+
+
         $questionNameKey = $message['chat']['id'].$bot->id.'_nameForFaq';
         if(Cache::has($questionNameKey))
         {
             Cache::forget($questionNameKey);
+            $this->botton->updateQuestionName($bot->id,$message["text"],$bottonId);
         }
 
-        $this->botton->updateQuestionName($bot->id,$message["text"]);
-
+        $faqs = $this->botton->listOfFAQ($bot->id,$bottonId);
+        $countOfFAQ = (isset($faqs) && !empty($faqs)) ? count($faqs) : 0;
+        if(!empty($faqs) && $countOfFAQ > 0)
+        {
+            $nameOfFaq = (isset($faqs[0]["name"]) && !empty($faqs[0]["name"])) ? $faqs[0]["name"] : "";
+            $this->botton->updateQuestionName($bot->id,$nameOfFaq,$bottonId);
+        }
 
         $keyboard = [
             [trans('start.PreviusBtn')]
@@ -1567,6 +1646,95 @@ class BottonController extends Controller
             'reply_markup' => $reply_markup
         ]);
     }
+
+
+
+
+
+     public function addAdditionalFaq($bot,$message)
+     {
+            $faqKey = $message['chat']['id'].$bot->id.'_createFaq';
+            if(Cache::has($faqKey))
+            {
+                Cache::forget($faqKey);
+            }
+            Cache::put($faqKey,$bot->id, 40320);
+
+            $html = "
+                
+                <i>خب متن سوال را ارسال کنید</i>     
+             ";
+
+            $keyboard = [
+                [trans('start.PreviusBtn')]
+            ];
+
+            $reply_markup = Telegram::replyKeyboardMarkup([
+                'keyboard' => $keyboard,
+                'resize_keyboard' => true,
+                'one_time_keyboard' => false
+            ]);
+
+            return Telegram::sendMessage([
+                'chat_id' => $message['chat']['id'],
+                'reply_to_message_id' => $message['message_id'],
+                'text' => $html,
+                'parse_mode' => 'HTML',
+                'reply_markup' => $reply_markup
+            ]);
+     }
+
+
+
+
+
+    public function addNewFaq($bot,$message)
+    {
+            $btnActionCacheKey = $message['chat']['id'].$bot->id.'_bottonAction';
+            if(Cache::has($btnActionCacheKey))
+            {
+                $cacheGet = Cache::get($btnActionCacheKey);
+                $botton = json_decode($cacheGet);
+            }
+            $bottonId = (isset($botton) && !empty($botton)) ? $botton[0] : null;
+
+
+            $this->botton->deleteAllFAQ($bot->id,$bottonId);
+
+            $faqKey = $message['chat']['id'].$bot->id.'_createFaq';
+            if(Cache::has($faqKey))
+            {
+                Cache::forget($faqKey);
+            }
+            Cache::put($faqKey,$bot->id, 40320);
+
+            $html = "
+                <i> توسط این قابلیت شما میتوانید فرمی از سوالات طراحی کنید که کاربر به آن ها پاسخ دهد و برای شما ارسال شود</i>     
+                <i>پس از پاسخ به هر سوال , سوال بعدی برای کاربر ارسال می شود و پس از اتمام سوالات, لیست سوال و جواب ها برای شما ارسال می شود</i>  
+                
+                
+                <i>خب متن اولین سوال را ارسال کنید</i>     
+             ";
+
+            $keyboard = [
+                [trans('start.PreviusBtn')]
+            ];
+
+            $reply_markup = Telegram::replyKeyboardMarkup([
+                'keyboard' => $keyboard,
+                'resize_keyboard' => true,
+                'one_time_keyboard' => false
+            ]);
+
+            return Telegram::sendMessage([
+                'chat_id' => $message['chat']['id'],
+                'reply_to_message_id' => $message['message_id'],
+                'text' => $html,
+                'parse_mode' => 'HTML',
+                'reply_markup' => $reply_markup
+            ]);
+    }
+
 
 
 

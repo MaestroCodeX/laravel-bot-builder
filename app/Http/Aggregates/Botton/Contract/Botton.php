@@ -34,7 +34,11 @@ interface  BottonContract
 
     public function createFaq($data);
 
-    public function updateQuestion($botID,$question,$type);
+    public function updateQuestion($botID,$question,$type,$bottonID);
 
-    public function updateQuestionName($botID,$text);
+    public function updateQuestionName($botID,$text,$bottonID);
+
+    public function listOfFAQ($botID,$bottonID);
+
+    public function deleteAllFAQ($botID,$bottonID);
 }

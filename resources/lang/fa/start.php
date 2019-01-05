@@ -41,5 +41,7 @@ return [
     'numberFaq' => 'عددی',
     'textFaq' => 'متنی',
     'phoneFaq' => 'شماره تماس',
-    'finishFaq' => 'اتمام سوالات'
+    'finishFaq' => 'اتمام سوالات',
+    'addAdditionalFaq' => 'اضافه کردن سوال',
+    'addNewFaq' => 'ثبت سوالات جدید'
 ];

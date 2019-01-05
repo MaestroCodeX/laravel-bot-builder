@@ -12,7 +12,7 @@ class BotFAQ extends Eloquent
 
     protected $table = 'bot_faq';
 
-    protected $fillable = ['question','answer_type','bot_id'];
+    protected $fillable = ['question','answer_type','bot_id','botton_id'];
 
     protected $dates = ['deleted_at'];
 
