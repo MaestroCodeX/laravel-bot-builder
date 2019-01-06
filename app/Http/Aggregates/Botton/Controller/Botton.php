@@ -1383,19 +1383,33 @@ class BottonController extends Controller
         {
             case "number" :
                 $text = " عددی ";
+                $keyboard = [
+                    [trans('start.PreviusBtn')]
+                ];
                 break;
             case "text" :
                 $text = " متنی ";
+                $keyboard = [
+                    [trans('start.PreviusBtn')]
+                ];
                 break;
             case "phone" :
                 $text = " شماره تماس ";
+                $keyboard = [
+                    [[
+                        'text' => trans('start.sendPhoneNumberFaq'),
+                        'request_contact' => true
+                    ]],
+                    [trans('start.PreviusBtn')]
+                ];
                 break;
             default:
+                $keyboard = [
+                    [trans('start.PreviusBtn')]
+                ];
                 $text = "";
         }
-        $keyboard = [
-            [trans('start.PreviusBtn')]
-        ];
+
 
         $html = "
                 <code>متن ارسالی باید از نوع ".$text." باشد</code> 
