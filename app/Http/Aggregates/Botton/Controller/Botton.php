@@ -1375,8 +1375,8 @@ class BottonController extends Controller
                 <i>نام کاربر : ".$user->first_name." ".$user->last_name."</i>
                 <i>نام کاربری : </i><a href='https://t.me/".str_replace('@','',$user->username)."'>".$user->username."</a>
                 <i>آیدی : </i><a href='https://t.me/".str_replace('@','',$user->username)."'>".$user->telegram_user_id."</a>
-                <i>مشاهده پاسخ ها : </i><a href='#'>question</a>
-                
+                <i>مشاهده پاسخ ها : </i><a href='https://api.telegram.org/bot".$bot->token."/sendMessage?chat_id=".$adminUser->user->telegram_user_id."&text=question_".$message['chat']['id']."'>question_".$message['chat']['id']."</a>
+
          ";
 
         Telegram::sendMessage([
