@@ -553,7 +553,7 @@ class UserController extends Controller
 
         $html = "
         <b>ابزارها</b>
-        
+
         <b>عضویت اجباری در کانال</b>
         <i>با فعال کردن این ابزارک هر شخصی که به ربات شما پیام دهد باید در کانالی که شما مشخص کرده اید عضو باشد در غیر این صورت تا زمانی که در کانال شما عضو نشود ربات برایش فعال نمی شود</i>
         ";
@@ -670,7 +670,7 @@ class UserController extends Controller
             <code>
                 ".$channelBot->message."
             </code>
-            
+
             <i>بعد از عضویت در کانال, ربات را مجددا </i> <a href='/start'>start</a> <i> کنید </i>
         ";
 

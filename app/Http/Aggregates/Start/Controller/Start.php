@@ -22,21 +22,21 @@ class StartController extends Controller
     }
 
     public function init($botID)
-    {  
+    {
             $bot = $this->bot->getBot($botID);
             if($bot !== null)
             {
-                config(['telegram.bot_token' => $bot->token]);
-                $updates = Telegram::getWebhookUpdates();
-                $message_id = $updates->getMessage()->getFrom()->getId();
-                if(isset($bot->user->telegram_user_id) && !empty($bot->user->telegram_user_id) && $bot->user->telegram_user_id == $message_id)
-                {
-                    return app(UserController::class)->AdminUserBot($bot,$updates);
-                }
-                return app(UserController::class)->UserBot($bot,$updates);
+                 config(['telegram.bot_token' => $bot->token]);
+                 $updates = Telegram::getWebhookUpdates();
+                 $message_id =  $updates->getMessage()->getFrom()->getId();
+                 if(isset($bot->user->telegram_user_id) && !empty($bot->user->telegram_user_id) && $bot->user->telegram_user_id == $message_id)
+                 {
+                     return app(UserController::class)->AdminUserBot($bot,$updates);
+                 }
+                 return app(UserController::class)->UserBot($bot,$updates);
             }
-            $updates = Telegram::getWebhookUpdates();
-            return app(AdminBotController::class)->AdminBot($updates);
+             $updates = Telegram::getWebhookUpdates();
+             return app(AdminBotController::class)->AdminBot($updates);
     }
 
 

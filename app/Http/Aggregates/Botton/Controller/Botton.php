@@ -1367,6 +1367,7 @@ class BottonController extends Controller
 
         $adminUser = $this->bot->getBot($bot->bot_id);
 
+
         $htmlAdmin = "
                 <i>فرم سوالات پاسخ داده شد</i>
                 <a href='#_والاتسقرم'>#فرم_سوالات</a>
@@ -1375,16 +1376,24 @@ class BottonController extends Controller
                 <i>نام کاربر : ".$user->first_name." ".$user->last_name."</i>
                 <i>نام کاربری : </i><a href='https://t.me/".str_replace('@','',$user->username)."'>".$user->username."</a>
                 <i>آیدی : </i><a href='https://t.me/".str_replace('@','',$user->username)."'>".$user->telegram_user_id."</a>
-                <i>مشاهده پاسخ ها : </i><a href='https://api.telegram.org/bot".$bot->token."/sendMessage?chat_id=".$adminUser->user->telegram_user_id."&text=question_".$message['chat']['id']."'>question_".$message['chat']['id']."</a>
-
          ";
+
+
+         $inline_keyboard = json_encode([
+            'inline_keyboard'=>[
+                [
+                    ['text'=>'مشاهده پاسخ ها','callback_data'=>'question_'.$message['chat']['id']]
+                ],
+            ]
+        ]);
 
         Telegram::sendMessage([
             'chat_id' => $adminUser->user->telegram_user_id,
             'text' => $htmlAdmin,
-            'parse_mode' => 'HTML'
+            'parse_mode' => 'HTML',
+            'disable_web_page_preview' => true,
+            'reply_markup' => $inline_keyboard
         ]);
-
 
 
         $keyboard = [
@@ -1410,6 +1419,7 @@ class BottonController extends Controller
             'reply_markup' => $reply_markup
         ]);
     }
+
 
 
     private function mustBeValidFaqType($message,$type)
