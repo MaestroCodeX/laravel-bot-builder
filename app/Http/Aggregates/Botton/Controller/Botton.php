@@ -1276,8 +1276,6 @@ class BottonController extends Controller
 
         $user = $this->botton->get_user($message['chat']['id']);
 
-//        $group = $this->botton->userAnswer($botton->id,$message['chat']['id']);
-
         $data = [
             "faq_id" => $faqID[0],
             "user_id" => $user->id,
@@ -1344,13 +1342,25 @@ class BottonController extends Controller
 
     private function responseDoneQuestion($bot,$message)
     {
-
         $userQuestionkey = $message['chat']['id'].$bot->id.'_userQuestionAnswer';
         if(Cache::has($userQuestionkey))
         {
             Cache::forget($userQuestionkey);
         }
 
+        $btnActionCacheKey = $message['chat']['id'].$bot->id.'_userBottonAction';
+        if(Cache::has($btnActionCacheKey))
+        {
+            $cacheGet = Cache::get($btnActionCacheKey);
+            $botton = json_decode($cacheGet);
+        }
+        $bottonId = (isset($botton) && !empty($botton)) ? $botton[0] : null;
+
+        $faqs = $this->botton->listOfFAQ($bot->id,$bottonId);
+
+        $user = $this->botton->get_user($message['chat']['id']);
+
+        $this->botton->updateAnswerGroup(count($faqs),$user->id,$bottonId);
 
         $keyboard = [
             [trans('start.PreviusBtn')]

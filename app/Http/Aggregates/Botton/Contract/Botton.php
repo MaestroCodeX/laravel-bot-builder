@@ -48,8 +48,8 @@ interface  BottonContract
 
     public function createAnswer($data);
 
-    public function userAnswer($botton_id, $user_id);
-
     public function get_user($user_id);
+
+    public function updateAnswerGroup($count,$user_id,$bottonId);
 
 }

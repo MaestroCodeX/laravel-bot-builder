@@ -141,13 +141,6 @@ class BottonRepository implements BottonContract
         return BotFAQ::where('id',$questionID)->first();
     }
 
-    public function userAnswer($botton_id, $user_id)
-    {
-        return FAQAnswer::where('user_id',$user_id)->whereHas('faq',function($query) use($botton_id) {
-            $query->where('botton_id',$botton_id);
-        })->groupBy('group')->orderBy("id","DESC")->get();
-    }
-
 
     public function createAnswer($data)
     {
@@ -161,4 +154,25 @@ class BottonRepository implements BottonContract
     }
 
 
+    public function updateAnswerGroup($count, $user_id, $bottonId)
+    {
+        $answers = FAQAnswer::where('user_id',$user_id)->whereHas("faq",function($query) use($bottonId) {
+            $query->where("botton_id",$bottonId);
+        })->orderBy("created_at","desc")->take($count)->get();
+
+        $max = FAQAnswer::where('user_id',$user_id)->whereHas("faq",function($query) use($bottonId) {
+            $query->where("botton_id",$bottonId);
+        })->max("group");
+
+        if(!empty($answers))
+        {
+            $group = $max+1;
+            foreach ($answers as $answer)
+            {
+                FAQAnswer::where("id",$answer["id"])->update(["group"=>$group]);
+            }
+        }
+
+        return true;
+    }
 }
