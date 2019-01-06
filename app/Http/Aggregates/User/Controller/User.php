@@ -131,6 +131,8 @@ class UserController extends Controller
                         return app(BottonController::class)->addAdditionalFaq($bot,$value['message']);
                     case trans('start.addNewFaq'):
                         return app(BottonController::class)->addNewFaq($bot,$value['message']);
+                    case strpos($value['message']['text'],'question_') === 0:
+                        return app(BottonController::class)->userAnswersForAdmin($bot,$value['message']);
                     case Cache::has($value['message']['chat']['id'].$bot->id.'_nameForFaq'):
                         return app(BottonController::class)->setFaqName($bot,$value['message']);
                     case Cache::has($value['message']['chat']['id'].$bot->id.'_createFaq'):

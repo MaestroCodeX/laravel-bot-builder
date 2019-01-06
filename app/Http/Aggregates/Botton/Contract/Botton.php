@@ -52,4 +52,5 @@ interface  BottonContract
 
     public function updateAnswerGroup($count,$user_id,$bottonId);
 
+    public function userAnswerList($botID, $userId);
 }

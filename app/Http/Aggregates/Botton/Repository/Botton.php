@@ -172,7 +172,18 @@ class BottonRepository implements BottonContract
                 FAQAnswer::where("id",$answer["id"])->update(["group"=>$group]);
             }
         }
-
         return true;
     }
+
+    public function userAnswerList($botID, $userId)
+    {
+        $group =  FAQAnswer::where("user_id",$userId)->whereHas("faq",function($query) use($botID) {
+            $query->where("bot_id",$botID);
+        })->max("group");
+
+        return FAQAnswer::where("user_id",$userId)->where("group",$group)->whereHas("faq",function($query) use($botID) {
+            $query->where("bot_id",$botID);
+        })->with("faq")->get();
+    }
+
 }

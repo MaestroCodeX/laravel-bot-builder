@@ -2041,6 +2041,31 @@ class BottonController extends Controller
 
 
 
+    public function userAnswersForAdmin($bot,$message)
+    {
+        $answerUserId = str_replace("question_","",$message["text"]);
+
+        $user = $this->botton->get_user(intval($answerUserId));
+
+        $answers = $this->botton->userAnswerList($bot->id,$user->id);
+
+         $adminUser = $this->bot->getBot($bot->bot_id);
+
+         foreach ($answers as $answer)
+         {
+             $html ="
+                 <b>".$answer->faq->question."</b>
+                 <pre>".$answer->answer."</pre>
+             ";
+
+               Telegram::sendMessage([
+                 'chat_id' => $adminUser->user->telegram_user_id,
+                 'text' => $html,
+                 'parse_mode' => 'HTML'
+             ]);
+         }
+         return "done";
+    }
 
 
 }
