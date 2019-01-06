@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Cache;
 use App\Http\Aggregates\User\Contract\UserContract as User;
 use App\Http\Aggregates\Botton\Contract\BottonContract as Botton;
+use App\Http\Aggregates\Bot\Contract\BotContract as Bot;
 use Exception;
 
 class BottonController extends Controller
@@ -14,11 +15,13 @@ class BottonController extends Controller
 
     private $user;
     private $botton;
+    private $bot;
 
-    public function __construct(Botton $botton, User $user)
+    public function __construct(Botton $botton, User $user, Bot $bot)
     {
         $this->botton = $botton;
         $this->user = $user;
+        $this->bot = $bot;
     }
 
 
@@ -609,11 +612,11 @@ class BottonController extends Controller
                 $this->botton->createBottonData($data);
                 $html = "
                 <i>خب این مطلب ذخیره شد</i>
-                
+
                 <i>اگر قصد اضافه کردن کپشن برای این فایل را دارید روی دکمه 'اضافه کردن کپشن' بزنید</i>
-                
+
                 <i> در غیر اینصورت اگر مطلب دیگری میخواهید به این دکمه اضافه کنید را ارسال کنید</i>
-                
+
                 <i>  و در غیر این صورت از دکمه اتمام استفاده کنید</i>
                 ";
                 $cacheKeyCaption = $message['chat']['id'].$bot->id.'_bottonCaption';
@@ -656,7 +659,7 @@ class BottonController extends Controller
                 $html = "
                     <i>خب این مطلب ذخیره شد</i>
                     <i>اگر مطلب دیگری میخواهید به این دکمه اضافه کنید را ارسال کنید</i>
-            
+
                     <i>در غیر این صورت از دکمه اتمام استفاده کنید</i>
                 ";
                 $keyboard = [
@@ -692,7 +695,7 @@ class BottonController extends Controller
                 $html = "
                     <i>خب این مطلب ذخیره شد</i>
                     <i>اگر مطلب دیگری میخواهید به این دکمه اضافه کنید را ارسال کنید</i>
-            
+
                     <i>در غیر این صورت از دکمه اتمام استفاده کنید</i>
                 ";
                 $keyboard = [
@@ -731,11 +734,11 @@ class BottonController extends Controller
 
                 $html = "
                 <i>خب این مطلب ذخیره شد</i>
-                
+
                 <i>اگر قصد اضافه کردن کپشن برای این تصویر را دارید روی دکمه 'اضافه کردن کپشن' بزنید</i>
-                
+
                 <i> در غیر اینصورت اگر مطلب دیگری میخواهید به این دکمه اضافه کنید را ارسال کنید</i>
-                
+
                 <i>  و در غیر این صورت از دکمه اتمام استفاده کنید</i>
                 ";
                 $cacheKeyCaption = $message['chat']['id'].$bot->id.'_bottonCaption';
@@ -768,7 +771,7 @@ class BottonController extends Controller
                 $html = "
                     <i>خب این مطلب ذخیره شد</i>
                     <i>اگر مطلب دیگری میخواهید به این دکمه اضافه کنید را ارسال کنید</i>
-            
+
                     <i>در غیر این صورت از دکمه اتمام استفاده کنید</i>
                 ";
                 $keyboard = [
@@ -793,7 +796,7 @@ class BottonController extends Controller
             $html = "
                     <i>خب این مطلب ذخیره شد</i>
                     <i>اگر مطلب دیگری میخواهید به این دکمه اضافه کنید را ارسال کنید</i>
-            
+
                     <i>در غیر این صورت از دکمه اتمام استفاده کنید</i>
               ";
             $keyboard = [
@@ -821,9 +824,9 @@ class BottonController extends Controller
     public function captionMessage($bot,$message)
     {
         $html = "
-                    <i>کپشن خود را برای فایل مورد نظر ارسال کنید</i>     
-                    
-                    <code>حداکثر 1024 کاراکتر</code>       
+                    <i>کپشن خود را برای فایل مورد نظر ارسال کنید</i>
+
+                    <code>حداکثر 1024 کاراکتر</code>
              ";
 
         $reply_markup = Telegram::replyKeyboardMarkup([
@@ -854,7 +857,7 @@ class BottonController extends Controller
         $html = "
                     <i>خب کپشن دخیره شد</i>
                     <i>اگر مطلب دیگری میخواهید به این دکمه اضافه کنید را ارسال کنید</i>
-            
+
                     <i>در غیر این صورت از دکمه اتمام استفاده کنید</i>
               ";
         $keyboard = [
@@ -1362,6 +1365,28 @@ class BottonController extends Controller
 
         $this->botton->updateAnswerGroup(count($faqs),$user->id,$bottonId);
 
+        $adminUser = $this->bot->getBot($bot->bot_id);
+
+        $htmlAdmin = "
+                <i>فرم سوالات پاسخ داده شد</i>
+                <a href='#_والاتسقرم'>#فرم_سوالات</a>
+
+                <i>نام فرم : ".$faqs[0]['name']."</i>
+                <i>نام کاربر : ".$user->first_name." ".$user->last_name."</i>
+                <i>نام کاربری : </i><a href='https://t.me/".str_replace('@','',$user->username)."'>".$user->username."</a>
+                <i>آیدی : </i><a href='https://t.me/".str_replace('@','',$user->username)."'>".$user->telegram_user_id."</a>
+                <i>مشاهده پاسخ ها : </i><a href='#'>question</a>
+                
+         ";
+
+        Telegram::sendMessage([
+            'chat_id' => $adminUser->user->telegram_user_id,
+            'text' => $htmlAdmin,
+            'parse_mode' => 'HTML'
+        ]);
+
+
+
         $keyboard = [
             [trans('start.PreviusBtn')]
         ];
@@ -1422,7 +1447,7 @@ class BottonController extends Controller
 
 
         $html = "
-                <code>متن ارسالی باید از نوع ".$text." باشد</code> 
+                <code>متن ارسالی باید از نوع ".$text." باشد</code>
          ";
 
         $reply_markup = Telegram::replyKeyboardMarkup([
@@ -1479,8 +1504,8 @@ class BottonController extends Controller
         $html = "
             <i> نام کاربری کانال را ارسال کنید</i>
             <i>نکته : ابتدا ربات را در کانال مدیر کنید</i>
-            
-            <i>برای مثال : </i> <a href='@parsbehcombot'>@parsbehcombot</a> 
+
+            <i>برای مثال : </i> <a href='@parsbehcombot'>@parsbehcombot</a>
         ";
 
         return Telegram::sendMessage([
@@ -1536,11 +1561,11 @@ class BottonController extends Controller
             ]);
 
             $html = "
-                <i> حالا متنی که هنگام عضو نبودن کاربر نمایش داده می شود را ارسال کنید</i>       
-                
-                <i>مثال:</i>     
+                <i> حالا متنی که هنگام عضو نبودن کاربر نمایش داده می شود را ارسال کنید</i>
+
+                <i>مثال:</i>
                 <i>لطفا در کانال</i> <a href='@parsbehcom'>@parsbehcom</a> <i>عضو شوید تا ربات برای شما فعال شود</i>
-                
+
                 <i>Parse Mode = HTML</i>
            ";
 
@@ -1565,7 +1590,7 @@ class BottonController extends Controller
             ]);
 
             $html = "
-                <i>  اطلاعات کانال ارسال شده وجود ندارد</i>            
+                <i>  اطلاعات کانال ارسال شده وجود ندارد</i>
             ";
 
             return Telegram::sendMessage([
@@ -1603,7 +1628,7 @@ class BottonController extends Controller
         ]);
 
         $html = "
-                <i> با موفقیت ثبت شد</i>            
+                <i> با موفقیت ثبت شد</i>
             ";
 
         return Telegram::sendMessage([
@@ -1631,7 +1656,7 @@ class BottonController extends Controller
         ]);
 
         $html = "
-            <i> عضویت اجباری در کانال با موفقیت غیرفعال شد</i>            
+            <i> عضویت اجباری در کانال با موفقیت غیرفعال شد</i>
         ";
 
         return Telegram::sendMessage([
@@ -1684,11 +1709,11 @@ class BottonController extends Controller
             Cache::put($faqKey,$bot->id, 40320);
 
             $html = "
-                <i> توسط این قابلیت شما میتوانید فرمی از سوالات طراحی کنید که کاربر به آن ها پاسخ دهد و برای شما ارسال شود</i>     
-                <i>پس از پاسخ به هر سوال , سوال بعدی برای کاربر ارسال می شود و پس از اتمام سوالات, لیست سوال و جواب ها برای شما ارسال می شود</i>  
-                
-                
-                <i>خب متن اولین سوال را ارسال کنید</i>     
+                <i> توسط این قابلیت شما میتوانید فرمی از سوالات طراحی کنید که کاربر به آن ها پاسخ دهد و برای شما ارسال شود</i>
+                <i>پس از پاسخ به هر سوال , سوال بعدی برای کاربر ارسال می شود و پس از اتمام سوالات, لیست سوال و جواب ها برای شما ارسال می شود</i>
+
+
+                <i>خب متن اولین سوال را ارسال کنید</i>
              ";
 
             $keyboard = [
@@ -1797,8 +1822,8 @@ class BottonController extends Controller
         $html = "
                     <i>این سوال با موفقیت اضافه شد</i>
                     <i>سوال بعدی را ارسال کنید</i>
-        
-        
+
+
                     <i>برای پایان طرح سوال از دکمه 'اتمام' استفاده کنید</i>
                 ";
 
@@ -1913,7 +1938,7 @@ class BottonController extends Controller
 
         $html = "
                     <i>سوالات با موفقیت ثبت شد</i>
-                    
+
                     <i>برای مدیریت پاسخ سوالات از دکمه 'مدیریت پاسخ فعلی' استفاده کنید</i>
                 ";
 
@@ -1940,8 +1965,8 @@ class BottonController extends Controller
             Cache::put($faqKey,$bot->id, 40320);
 
             $html = "
-                
-                <i>خب متن سوال را ارسال کنید</i>     
+
+                <i>خب متن سوال را ارسال کنید</i>
              ";
 
             $keyboard = [
@@ -1988,11 +2013,11 @@ class BottonController extends Controller
             Cache::put($faqKey,$bot->id, 40320);
 
             $html = "
-                <i> توسط این قابلیت شما میتوانید فرمی از سوالات طراحی کنید که کاربر به آن ها پاسخ دهد و برای شما ارسال شود</i>     
-                <i>پس از پاسخ به هر سوال , سوال بعدی برای کاربر ارسال می شود و پس از اتمام سوالات, لیست سوال و جواب ها برای شما ارسال می شود</i>  
-                
-                
-                <i>خب متن اولین سوال را ارسال کنید</i>     
+                <i> توسط این قابلیت شما میتوانید فرمی از سوالات طراحی کنید که کاربر به آن ها پاسخ دهد و برای شما ارسال شود</i>
+                <i>پس از پاسخ به هر سوال , سوال بعدی برای کاربر ارسال می شود و پس از اتمام سوالات, لیست سوال و جواب ها برای شما ارسال می شود</i>
+
+
+                <i>خب متن اولین سوال را ارسال کنید</i>
              ";
 
             $keyboard = [

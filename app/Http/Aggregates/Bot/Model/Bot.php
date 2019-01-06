@@ -3,6 +3,7 @@
 use Illuminate\Database\Eloquent\Model as Eloquent;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Http\Aggregates\User\Model\User;
+
 class Bot extends Eloquent
 {
     use SoftDeletes;
