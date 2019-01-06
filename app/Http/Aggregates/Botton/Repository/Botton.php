@@ -1,7 +1,8 @@
 <?php namespace App\Http\Aggregate\Botton\Repository;
 
-use App\Http\Aggregates\Botton\Model\{BotFAQ, BotUser, Botton, BotChannel, BottonData};
+use App\Http\Aggregates\Botton\Model\{BotFAQ, BotUser, Botton, BotChannel, BottonData, FAQAnswer};
 use App\Http\Aggregates\Botton\Contract\BottonContract;
+
 
 class BottonRepository implements BottonContract
 {
@@ -31,6 +32,11 @@ class BottonRepository implements BottonContract
     public function createBotton($data)
     {
         return Botton::create($data);
+    }
+
+    public function updateBottonType($bottonID,$type)
+    {
+        return Botton::where('id',$bottonID)->update(['type'=>$type]);
     }
 
     public function bottonList($bot,$parent_id)
@@ -129,5 +135,30 @@ class BottonRepository implements BottonContract
     {
         return BotFAQ::where('bot_id',$botID)->where('botton_id',$bottonID)->forcedelete();
     }
+
+    public function getQuestion($questionID)
+    {
+        return BotFAQ::where('id',$questionID)->first();
+    }
+
+    public function userAnswer($botton_id, $user_id)
+    {
+        return FAQAnswer::where('user_id',$user_id)->whereHas('faq',function($query) use($botton_id) {
+            $query->where('botton_id',$botton_id);
+        })->groupBy('group')->orderBy("id","DESC")->get();
+    }
+
+
+    public function createAnswer($data)
+    {
+        FAQAnswer::create($data);
+    }
+
+
+    public function get_user($user_id)
+    {
+        return BotUser::where('telegram_user_id',$user_id)->first();
+    }
+
 
 }

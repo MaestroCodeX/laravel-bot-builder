@@ -41,4 +41,15 @@ interface  BottonContract
     public function listOfFAQ($botID,$bottonID);
 
     public function deleteAllFAQ($botID,$bottonID);
+
+    public function updateBottonType($bottonID,$type);
+
+    public function getQuestion($questionID);
+
+    public function createAnswer($data);
+
+    public function userAnswer($botton_id, $user_id);
+
+    public function get_user($user_id);
+
 }

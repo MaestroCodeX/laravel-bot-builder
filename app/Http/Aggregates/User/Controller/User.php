@@ -584,31 +584,31 @@ class UserController extends Controller
             }
 
 
-        $channelBot = $this->botton->getChannelBot($bot->id);
-        if(!is_null($channelBot))
-        {
-            $clientApi = new Client();
-            $apiData = "https://api.telegram.org/bot".$bot->token."/getChatMember?chat_id=".$channelBot->username."&user_id=".$value['message']['chat']['id'];
-            $responseData = $clientApi->get($apiData);
-            $dataRes = (string)$responseData->getBody();
-            $decode =  json_decode($dataRes,true);
-            if(isset($decode['ok']) && $decode['ok'] == true && isset($decode['result']['status']) && $decode['result']['status'] !== "member")
+            $channelBot = $this->botton->getChannelBot($bot->id);
+            if(!is_null($channelBot))
             {
-                return $this->channelJoinWarning($bot,$value['message'],$channelBot);
+                $clientApi = new Client();
+                $apiData = "https://api.telegram.org/bot".$bot->token."/getChatMember?chat_id=".$channelBot->username."&user_id=".$value['message']['chat']['id'];
+                $responseData = $clientApi->get($apiData);
+                $dataRes = (string)$responseData->getBody();
+                $decode =  json_decode($dataRes,true);
+                if(isset($decode['ok']) && $decode['ok'] == true && isset($decode['result']['status']) && $decode['result']['status'] !== "member")
+                {
+                    return $this->channelJoinWarning($bot,$value['message'],$channelBot);
+                }
+                $botUser = $this->botton->getBotUser($bot->id,$value['message']['chat']['id']);
+                if(is_null($botUser))
+                {
+                    $data = [
+                        "bot_id" => $bot->id,
+                        "telegram_user_id" => (isset($decode['result']['user']['id'])) ? $decode['result']['user']['id'] : null,
+                        "username" => (isset($decode['result']['user']['username'])) ? $decode['result']['user']['username'] : null,
+                        "first_name" => (isset($decode['result']['user']['first_name'])) ? $decode['result']['user']['first_name'] : null,
+                        "last_name" => (isset($decode['result']['user']['last_name'])) ? $decode['result']['user']['last_name'] : null,
+                    ];
+                    $this->botton->createBotUser($data);
+                }
             }
-            $botUser = $this->botton->getBotUser($bot->id,$value['message']['chat']['id']);
-            if(is_null($botUser))
-            {
-                $data = [
-                    "bot_id" => $bot->id,
-                    "telegram_user_id" => (isset($decode['result']['user']['id'])) ? $decode['result']['user']['id'] : null,
-                    "username" => (isset($decode['result']['user']['username'])) ? $decode['result']['user']['username'] : null,
-                    "first_name" => (isset($decode['result']['user']['first_name'])) ? $decode['result']['user']['first_name'] : null,
-                    "last_name" => (isset($decode['result']['user']['last_name'])) ? $decode['result']['user']['last_name'] : null,
-                ];
-                $this->botton->createBotUser($data);
-            }
-        }
 
 
             $btnActionCacheKey = $value['message']['chat']['id'].$bot->id.'_userBottonAction';
@@ -629,6 +629,8 @@ class UserController extends Controller
                         return $this->UserStart($value['message'],$bot);
                     case trans('start.PreviusBtn'):
                         return $this->UserStart($value['message'],$bot);
+                    case trans('start.sendPhoneNumberFaq') || Cache::has($value['message']['chat']['id'].$bot->id.'_userQuestionAnswer'):
+                        return app(BottonController::class)->userFAQanswer($bot,$value['message']);
                     case isset($botton) && !empty($botton):
                         return app(BottonController::class)->UerBottonActions($bot,$value['message'],$botton);
                     default:
@@ -681,6 +683,11 @@ class UserController extends Controller
             'action' => 'typing'
         ]);
         $btnActionCacheKey = $message['chat']['id'].$bot->id.'_userBottonAction';
+        $userQuestionkey = $message['chat']['id'].$bot->id.'_userQuestionAnswer';
+        if(Cache::has($userQuestionkey))
+        {
+            Cache::forget($userQuestionkey);
+        }
         if(Cache::has($btnActionCacheKey))
         {
             Cache::forget($btnActionCacheKey);
@@ -728,6 +735,11 @@ class UserController extends Controller
             'action' => 'typing'
         ]);
         $btnActionCacheKey = $message['chat']['id'].$bot->id.'_userBottonAction';
+        $userQuestionkey = $message['chat']['id'].$bot->id.'_userQuestionAnswer';
+        if(Cache::has($userQuestionkey))
+        {
+            Cache::forget($userQuestionkey);
+        }
         if(Cache::has($btnActionCacheKey))
         {
             Cache::forget($btnActionCacheKey);

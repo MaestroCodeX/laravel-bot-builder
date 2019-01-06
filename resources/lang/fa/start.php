@@ -43,5 +43,6 @@ return [
     'phoneFaq' => 'شماره تماس',
     'finishFaq' => 'اتمام سوالات',
     'addAdditionalFaq' => 'اضافه کردن سوال',
-    'addNewFaq' => 'ثبت سوالات جدید'
+    'addNewFaq' => 'ثبت سوالات جدید',
+    'sendPhoneNumberFaq' => 'ارسال شماره تماس'
 ];

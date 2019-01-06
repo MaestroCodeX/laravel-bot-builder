@@ -881,6 +881,16 @@ class BottonController extends Controller
 
     public function doneCreateArticle($bot,$message)
     {
+        $btnActionCacheKey = $message['chat']['id'].$bot->id.'_bottonAction';
+        if(Cache::has($btnActionCacheKey))
+        {
+            $cacheGet = Cache::get($btnActionCacheKey);
+            $botton = json_decode($cacheGet);
+        }
+        $bottonId = (isset($botton) && !empty($botton)) ? $botton[0] : null;
+
+        $this->botton->updateBottonType($bottonId,'article');
+
         $cacheKeyCaption = $message['chat']['id'].$bot->id.'_bottonCaption';
         if(Cache::has($cacheKeyCaption))
         {
@@ -1027,8 +1037,6 @@ class BottonController extends Controller
         $keyboard = $keyboards;
 
 
-        $bottonData = $this->botton->bottonData($bot->id,$botton->id);
-
         $reply_markup = Telegram::replyKeyboardMarkup([
             'keyboard' => $keyboard,
             'resize_keyboard' => true,
@@ -1051,6 +1059,21 @@ class BottonController extends Controller
             'reply_markup' => $reply_markup
         ]);
 
+        switch ($botton->type)
+        {
+            case "article":
+                return $this->articleData($bot,$botton,$message);
+            case "faq":
+                return $this->faqData($bot,$botton,$message);
+            default:
+                return "Done";
+        }
+    }
+
+
+    private function articleData($bot,$botton,$message)
+    {
+        $bottonData = $this->botton->bottonData($bot->id,$botton->id);
 
         foreach($bottonData as $data)
         {
@@ -1081,15 +1104,15 @@ class BottonController extends Controller
 
                 case 'video':
 
-                        Telegram::sendChatAction([
-                            'chat_id' => $message['chat']['id'],
-                            'action' => 'upload_video'
-                        ]);
-                        Telegram::sendAudio([
-                            'chat_id' => $message['chat']['id'],
-                            'audio' => $data['data'],
-                        ]);
-                        break;
+                    Telegram::sendChatAction([
+                        'chat_id' => $message['chat']['id'],
+                        'action' => 'upload_video'
+                    ]);
+                    Telegram::sendAudio([
+                        'chat_id' => $message['chat']['id'],
+                        'audio' => $data['data'],
+                    ]);
+                    break;
 
 
                 case 'audio':
@@ -1137,7 +1160,7 @@ class BottonController extends Controller
                     Telegram::sendLocation([
                         'chat_id' => $message['chat']['id'],
                         'latitude' => $location->latitude,
-	                    'longitude' => $location->longitude,
+                        'longitude' => $location->longitude,
                     ]);
                     break;
 
@@ -1147,7 +1170,7 @@ class BottonController extends Controller
                         'chat_id' => $message['chat']['id'],
                         'action' => 'typing'
                     ]);
-                     Telegram::sendMessage([
+                    Telegram::sendMessage([
                         'chat_id' => $message['chat']['id'],
                         'text' => "<i>".$data['data']."</i>",
                         'parse_mode' => 'HTML',
@@ -1160,7 +1183,238 @@ class BottonController extends Controller
     }
 
 
+    private function faqData($bot,$botton,$message)
+    {
+        $faqData = $this->botton->listOfFAQ($bot->id,$botton->id);
+        if(isset($faqData) && !empty($faqData))
+        {
+            $question = $faqData->pluck('id');
 
+            $userQuestionkey = $message['chat']['id'].$bot->id.'_userQuestionAnswer';
+            if(Cache::has($userQuestionkey))
+            {
+                Cache::forget($userQuestionkey);
+            }
+            Cache::put($userQuestionkey,json_encode($question), 40320);
+
+            $question = $this->botton->getQuestion($question[0]);
+
+            $html = "
+                <i>".$question->question."</i>
+                ";
+
+            Telegram::sendChatAction([
+                'chat_id' => $message['chat']['id'],
+                'action' => 'typing'
+            ]);
+
+            if($question->answer_type == "phone")
+            {
+                $keyboard = [
+                    [
+                        [
+                        'text' => trans('start.sendPhoneNumberFaq'),
+                        'request_contact' => true
+                        ]
+                    ]
+                    [trans('start.PreviusBtn')]
+                ];
+            }
+            else
+            {
+                $keyboard = [
+                    [trans('start.PreviusBtn')]
+                ];
+            }
+
+            $reply_markup = Telegram::replyKeyboardMarkup([
+                'keyboard' => $keyboard,
+                'resize_keyboard' => true,
+                'one_time_keyboard' => false
+            ]);
+
+            return Telegram::sendMessage([
+                'chat_id' => $message['chat']['id'],
+                'reply_to_message_id' => $message['message_id'],
+                'text' => $html,
+                'parse_mode' => 'HTML',
+                'reply_markup' => $reply_markup
+            ]);
+        }
+    }
+
+
+
+    public function userFAQanswer($bot,$message)
+    {
+        Telegram::sendChatAction([
+            'chat_id' => $message['chat']['id'],
+            'action' => 'typing'
+        ]);
+
+        $userQuestionkey = $message['chat']['id'].$bot->id.'_userQuestionAnswer';
+        if(Cache::has($userQuestionkey))
+        {
+            $question = Cache::get($userQuestionkey);
+            $arrayFaq = json_decode($question);
+            $faqID = json_decode($question);
+        }
+
+        $getQuestion = $this->botton->getQuestion($faqID[1]);
+        if($getQuestion->answer_type == "number" && !is_numeric($message["text"]))
+        {
+            return $this->mustBeValidFaqType($message,"number");
+        }
+        elseif($getQuestion->answer_type == "text" && !is_string($message["text"]))
+        {
+            return $this->mustBeValidFaqType($message,"text");
+        }
+        elseif($getQuestion->answer_type == "phone" && !isset($message['contact']) && !isset($message['contact']['phone_number']))
+        {
+            return $this->mustBeValidFaqType($message,"phone");
+        }
+
+        $user = $this->botton->get_user($message['chat']['id']);
+
+//        $group = $this->botton->userAnswer($botton->id,$message['chat']['id']);
+
+        $data = [
+            "faq_id" => $faqID[0],
+            "user_id" => $user->id,
+            "answer" => (isset($message['contact']) && isset($message['contact']['phone_number'])) ? $message['contact']['phone_number'] : $message["text"],
+            "group" => 1
+        ];
+        $this->botton->createAnswer($data);
+
+
+        array_shift($arrayFaq);
+        $arrayItems = (!is_array($arrayFaq)) ? (array)$arrayFaq : $arrayFaq;
+        if(count($arrayItems) == 0)
+        {
+            return $this->responseDoneQuestion($bot,$message);
+        }
+
+        $userQuestionkey = $message['chat']['id'].$bot->id.'_userQuestionAnswer';
+        if(Cache::has($userQuestionkey))
+        {
+            Cache::forget($userQuestionkey);
+        }
+        Cache::put($userQuestionkey,json_encode($arrayItems), 40320);
+
+
+        $question = $this->botton->getQuestion($faqID[1]);
+
+        $html = "
+                <i>".$question->question."</i>
+                ";
+
+        if($question->answer_type == "phone")
+        {
+            $keyboard = [
+                [[
+                    'text' => trans('start.sendPhoneNumberFaq'),
+                    'request_contact' => true
+                ]]
+                [trans('start.PreviusBtn')]
+            ];
+        }
+        else
+        {
+            $keyboard = [
+                [trans('start.PreviusBtn')]
+            ];
+        }
+
+        $reply_markup = Telegram::replyKeyboardMarkup([
+            'keyboard' => $keyboard,
+            'resize_keyboard' => true,
+            'one_time_keyboard' => false
+        ]);
+
+        return Telegram::sendMessage([
+            'chat_id' => $message['chat']['id'],
+            'reply_to_message_id' => $message['message_id'],
+            'text' => $html,
+            'parse_mode' => 'HTML',
+            'reply_markup' => $reply_markup
+        ]);
+    }
+
+
+
+    private function responseDoneQuestion($bot,$message)
+    {
+
+        $userQuestionkey = $message['chat']['id'].$bot->id.'_userQuestionAnswer';
+        if(Cache::has($userQuestionkey))
+        {
+            Cache::forget($userQuestionkey);
+        }
+
+
+        $keyboard = [
+            [trans('start.PreviusBtn')]
+        ];
+
+        $html = "
+                <i>با موفقیت اطلاعات ثبت شد</i>
+                <i>منتظر تایید مدیر باشید</i>
+         ";
+
+        $reply_markup = Telegram::replyKeyboardMarkup([
+            'keyboard' => $keyboard,
+            'resize_keyboard' => true,
+            'one_time_keyboard' => false
+        ]);
+
+        return Telegram::sendMessage([
+            'chat_id' => $message['chat']['id'],
+            'reply_to_message_id' => $message['message_id'],
+            'text' => $html,
+            'parse_mode' => 'HTML',
+            'reply_markup' => $reply_markup
+        ]);
+    }
+
+
+    private function mustBeValidFaqType($message,$type)
+    {
+        switch ($type)
+        {
+            case "number" :
+                $text = "عددی";
+                break;
+            case "text" :
+                $text = "متنی";
+                break;
+            case "phone" :
+                $text = "شماره تماس";
+                break;
+            default:
+                $text = "";
+        }
+        $keyboard = [
+            [trans('start.PreviusBtn')]
+        ];
+
+        $html = "
+                <code>متن ارسالی باید از نوع</code>". $text ."باشد
+         ";
+
+        $reply_markup = Telegram::replyKeyboardMarkup([
+            'keyboard' => $keyboard,
+            'resize_keyboard' => true,
+            'one_time_keyboard' => false
+        ]);
+
+        return Telegram::sendMessage([
+            'chat_id' => $message['chat']['id'],
+            'reply_to_message_id' => $message['message_id'],
+            'text' => $html,
+            'parse_mode' => 'HTML',
+            'reply_markup' => $reply_markup
+        ]);
+    }
 
 
     public  function joinBotton($bot,$message)
@@ -1544,6 +1798,7 @@ class BottonController extends Controller
         }
         $bottonId = (isset($botton) && !empty($botton)) ? $botton[0] : null;
 
+        $this->botton->updateBottonType($bottonId,'faq');
 
         $faqKey = $message['chat']['id'].$bot->id.'_createFaq';
         $questionKey = $message['chat']['id'].$bot->id.'_answerType';

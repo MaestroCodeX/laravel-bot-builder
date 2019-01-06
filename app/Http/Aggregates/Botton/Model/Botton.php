@@ -13,7 +13,7 @@ class Botton extends Eloquent
 
     protected $table = 'bottons';
 
-    protected $fillable = ['parent_id','name','bot_id','position'];
+    protected $fillable = ['parent_id','name','bot_id','position','type'];
 
     protected $dates = ['deleted_at'];
 
