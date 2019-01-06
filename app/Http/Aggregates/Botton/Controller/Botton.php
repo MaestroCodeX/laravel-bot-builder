@@ -1216,7 +1216,7 @@ class BottonController extends Controller
                         'text' => trans('start.sendPhoneNumberFaq'),
                         'request_contact' => true
                         ]
-                    ]
+                    ],
                     [trans('start.PreviusBtn')]
                 ];
             }
@@ -1260,16 +1260,16 @@ class BottonController extends Controller
             $faqID = json_decode($question);
         }
 
-        $getQuestion = $this->botton->getQuestion($faqID[1]);
+        $getQuestion = $this->botton->getQuestion($faqID[0]);
         if($getQuestion->answer_type == "number" && !is_numeric($message["text"]))
         {
             return $this->mustBeValidFaqType($message,"number");
         }
-        elseif($getQuestion->answer_type == "text" && !is_string($message["text"]))
+        if($getQuestion->answer_type == "text" && !is_string($message["text"]))
         {
             return $this->mustBeValidFaqType($message,"text");
         }
-        elseif($getQuestion->answer_type == "phone" && !isset($message['contact']) && !isset($message['contact']['phone_number']))
+        if($getQuestion->answer_type == "phone" && !isset($message['contact']) && !isset($message['contact']['phone_number']))
         {
             return $this->mustBeValidFaqType($message,"phone");
         }
@@ -1314,7 +1314,7 @@ class BottonController extends Controller
                 [[
                     'text' => trans('start.sendPhoneNumberFaq'),
                     'request_contact' => true
-                ]]
+                ]],
                 [trans('start.PreviusBtn')]
             ];
         }
@@ -1382,13 +1382,13 @@ class BottonController extends Controller
         switch ($type)
         {
             case "number" :
-                $text = "عددی";
+                $text = " عددی ";
                 break;
             case "text" :
-                $text = "متنی";
+                $text = " متنی ";
                 break;
             case "phone" :
-                $text = "شماره تماس";
+                $text = " شماره تماس ";
                 break;
             default:
                 $text = "";
@@ -1398,7 +1398,7 @@ class BottonController extends Controller
         ];
 
         $html = "
-                <code>متن ارسالی باید از نوع</code>". $text ."باشد
+                <code>متن ارسالی باید از نوع ".$text." باشد</code> 
          ";
 
         $reply_markup = Telegram::replyKeyboardMarkup([

@@ -619,6 +619,12 @@ class UserController extends Controller
             }
             $parentId = (isset($btnInfo) && !empty($btnInfo)) ? $btnInfo[0] : null;
 
+
+            if(isset($value['message']['contact']))
+            {
+                return app(BottonController::class)->userFAQanswer($bot,$value['message']);
+            }
+
             if(isset($value['message']['text']))
             {
                 $botton = $this->botton->existParentBtn($value['message']['text'],$bot->id,$value['message']['chat']['id'],$parentId);
@@ -629,7 +635,7 @@ class UserController extends Controller
                         return $this->UserStart($value['message'],$bot);
                     case trans('start.PreviusBtn'):
                         return $this->UserStart($value['message'],$bot);
-                    case trans('start.sendPhoneNumberFaq') || Cache::has($value['message']['chat']['id'].$bot->id.'_userQuestionAnswer'):
+                    case Cache::has($value['message']['chat']['id'].$bot->id.'_userQuestionAnswer'):
                         return app(BottonController::class)->userFAQanswer($bot,$value['message']);
                     case isset($botton) && !empty($botton):
                         return app(BottonController::class)->UerBottonActions($bot,$value['message'],$botton);
