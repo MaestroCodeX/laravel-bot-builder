@@ -22,7 +22,6 @@ class UserAnswers extends Migration
             $table->unsignedInteger('faq_id');
             $table->foreign('faq_id')->references('id')->on('bot_faq');
             $table->unsignedInteger('user_id');
-            $table->foreign('user_id')->references('id')->on('bot_users');
             $table->timestamps();
             $table->softDeletes();
         });

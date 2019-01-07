@@ -1277,11 +1277,9 @@ class BottonController extends Controller
             return $this->mustBeValidFaqType($message,"phone");
         }
 
-        $user = $this->botton->get_user($message['chat']['id']);
-
         $data = [
             "faq_id" => $faqID[0],
-            "user_id" => $user->id,
+            "user_id" => $message['chat']['id'],
             "answer" => (isset($message['contact']) && isset($message['contact']['phone_number'])) ? $message['contact']['phone_number'] : $message["text"],
             "group" => 1
         ];
@@ -1361,9 +1359,7 @@ class BottonController extends Controller
 
         $faqs = $this->botton->listOfFAQ($bot->id,$bottonId);
 
-        $user = $this->botton->get_user($message['chat']['id']);
-
-        $this->botton->updateAnswerGroup(count($faqs),$user->id,$bottonId);
+        $this->botton->updateAnswerGroup(count($faqs),$message['chat']['id'],$bottonId);
 
         $adminUser = $this->bot->getBot($bot->bot_id);
 
@@ -1373,9 +1369,9 @@ class BottonController extends Controller
                 <a href='#_والاتسقرم'>#فرم_سوالات</a>
 
                 <i>نام فرم : ".$faqs[0]['name']."</i>
-                <i>نام کاربر : ".$user->first_name." ".$user->last_name."</i>
-                <i>نام کاربری : </i><a href='https://t.me/".str_replace('@','',$user->username)."'>".$user->username."</a>
-                <i>آیدی : </i><a href='https://t.me/".str_replace('@','',$user->username)."'>".$user->telegram_user_id."</a>
+                <i>نام کاربر : ".$message['chat']['first_name']." ".$message['chat']['last_name']."</i>
+                <i>نام کاربری : </i><a href='https://t.me/".str_replace('@','',$message['chat']['username'])."'>".$message['chat']['username']."</a>
+                <i>آیدی : </i><a href='https://t.me/".str_replace('@','',$message['chat']['username'])."'>".$message['chat']['id']."</a>
          ";
 
 
@@ -1386,6 +1382,7 @@ class BottonController extends Controller
                 ],
             ]
         ]);
+
 
         Telegram::sendMessage([
             'chat_id' => $adminUser->user->telegram_user_id,
@@ -2055,9 +2052,7 @@ class BottonController extends Controller
     {
         $answerUserId = str_replace("question_","",$message["text"]);
 
-        $user = $this->botton->get_user(intval($answerUserId));
-
-        $answers = $this->botton->userAnswerList($bot->id,$user->id);
+        $answers = $this->botton->userAnswerList($bot->id,intval($answerUserId));
 
          $adminUser = $this->bot->getBot($bot->bot_id);
 

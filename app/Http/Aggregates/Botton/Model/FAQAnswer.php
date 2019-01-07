@@ -22,7 +22,7 @@ class FAQAnswer extends Eloquent
 
     public function user()
     {
-        return $this->belongsTo(BotUser::class,'user_id','id');
+        return $this->belongsTo(BotUser::class,'user_id','telegram_user_id');
     }
 
 }
